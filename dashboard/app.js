@@ -13,6 +13,8 @@ const categoryLabels = {
   residential_or_other_damage: "Other damage",
 };
 
+const appVersion = "thumbs-20260629";
+
 const categoryColors = {
   residential_damage: "#d9483b",
   demolished_after_occupation: "#f0eadf",
@@ -279,7 +281,7 @@ function renderDetail(target) {
 }
 
 async function init() {
-  const response = await fetch("data/targets.json");
+  const response = await fetch(`data/targets.json?v=${appVersion}`);
   if (!response.ok) throw new Error(`Could not load dashboard data: ${response.status}`);
   const payload = await response.json();
   state.targets = payload.targets;
