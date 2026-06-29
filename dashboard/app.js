@@ -207,13 +207,13 @@ function linkList(target) {
 }
 
 function localImageSrc(image) {
+  if (image.thumb) return image.thumb.replace(/\\/g, "/");
   if (!image.src) return "";
   return image.src.replace(/\\/g, "/");
 }
 
 function preferredImageSrc(image) {
-  const local = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
-  return local ? (localImageSrc(image) || image.url) : (image.url || localImageSrc(image));
+  return localImageSrc(image) || image.url;
 }
 
 function fallbackImageSrc(image) {
@@ -231,8 +231,9 @@ function renderGallery(target) {
       ${target.images.map((image, index) => {
         const imageSrc = preferredImageSrc(image);
         const fallbackSrc = fallbackImageSrc(image);
+        const fullImageHref = image.url || imageSrc;
         return `
-        <a href="${escapeHtml(imageSrc)}" target="_blank" rel="noopener noreferrer" title="Open image ${index + 1}">
+        <a href="${escapeHtml(fullImageHref)}" target="_blank" rel="noopener noreferrer" title="Open image ${index + 1}">
           <img
             src="${escapeHtml(imageSrc)}"
             ${fallbackSrc ? `data-fallback-src="${escapeHtml(fallbackSrc)}"` : ""}
