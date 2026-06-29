@@ -1,0 +1,33 @@
+{
+  "features": 4895,
+  "features_with_images": 3762,
+  "features_with_videos": 9,
+  "image_url_count": 10593,
+  "video_url_count": 9,
+  "features_by_class": {
+    "demolished_after_occupation": 395,
+    "residential_damage": 2313,
+    "grave_or_victim": 1140,
+    "humanitarian_problem": 150,
+    "battle_or_route": 350,
+    "school": 110,
+    "hospital_or_clinic": 47,
+    "commerce_or_hotel": 259,
+    "church": 27,
+    "culture_or_sport": 43,
+    "public_institution": 61
+  },
+  "image_urls_by_class": {
+    "residential_damage": 4512,
+    "demolished_after_occupation": 2024,
+    "grave_or_victim": 1736,
+    "humanitarian_problem": 219,
+    "battle_or_route": 315,
+    "school": 528,
+    "hospital_or_clinic": 195,
+    "commerce_or_hotel": 559,
+    "church": 121,
+    "culture_or_sport": 183,
+    "public_institution": 201
+  }
+}

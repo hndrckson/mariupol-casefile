@@ -1,0 +1,68 @@
+{
+  "source": "Mariupol Destruction and Victims Map",
+  "map_id": "1n0elDNzvK4vQYmWxCn2792ljSXNJK4x3",
+  "extracted_features": 4895,
+  "geometry_counts": {
+    "Point": 4837,
+    "LineString": 58
+  },
+  "inferred_class_counts": {
+    "demolished_after_occupation": 395,
+    "residential_damage": 2259,
+    "battle_or_route": 405,
+    "grave_or_victim": 1140,
+    "humanitarian_problem": 149,
+    "school": 110,
+    "hospital_or_clinic": 47,
+    "commerce_or_hotel": 259,
+    "church": 27,
+    "culture_or_sport": 43,
+    "public_institution": 61
+  },
+  "layers": [
+    {
+      "id": "1n0elDNzvK4vQYmWxCn2792ljSXNJK4x3",
+      "name": "Mariupol's Destruction and Victims Map (3500 houses)  Author Vitaly Shtutman/Разрушения и жертвы Мариуполя на карте (3500 домов). Автор проекта Штутман Виталий"
+    },
+    {
+      "id": "njTOiP47MDE",
+      "name": "Жилые дома. Видео и фото разрушенных домов Мариуполя/Residential buildings. Video and photos of destroyed houses in Mariupol"
+    },
+    {
+      "id": "q-xaLC-t1bI",
+      "name": "Могилы (137) и места гибели и ранений (более 600 мест)/Graves and places of death and injury (Over 600 places)"
+    },
+    {
+      "id": "4kC8XkOEing",
+      "name": "Выживание в Мариупольском аду. Места гуманитарных проблем жителей / Places of humanitarian problems of residents"
+    },
+    {
+      "id": "KrOpOzTuT5I",
+      "name": "Бои в городе/Fighting in the city"
+    },
+    {
+      "id": "7F9FVlzeoRE",
+      "name": "Школы (64), Детские сады (21) и Институты и колледжи (24 разрушенных ВУЗов) Мариуполя/Destroyed children's and educational institutions - Schools (64), Kindergartens (19), Institutes and colleges (24)"
+    },
+    {
+      "id": "zuPyjcilW0A",
+      "name": "Мед. учреждения Мариуполя (42 разрушенных)/Hospitals (42)"
+    },
+    {
+      "id": "v7s54XqXcXY",
+      "name": "Рынки, магазины, кафе и гостиницы Мариуполя/Market's, shop's, cafe's and hotels"
+    },
+    {
+      "id": "cPPoRUv24Jw",
+      "name": "Церкви Мариуполя (21 разрушенных)/Churches (21)"
+    },
+    {
+      "id": "13VPnJnxXdw",
+      "name": "Кинотеатры, ДК, Музеи и Спорт / Cinemas, cultural centers, museums and stadiums"
+    },
+    {
+      "id": "bH5iAa5kyEk",
+      "name": "Гос. учреждения Мариуполя"
+    }
+  ]
+}
