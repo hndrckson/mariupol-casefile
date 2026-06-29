@@ -206,6 +206,22 @@ function linkList(target) {
   `).join("");
 }
 
+function localImageSrc(image) {
+  if (!image.src) return "";
+  return image.src.replace(/\\/g, "/");
+}
+
+function preferredImageSrc(image) {
+  const local = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  return local ? (localImageSrc(image) || image.url) : (image.url || localImageSrc(image));
+}
+
+function fallbackImageSrc(image) {
+  const preferred = preferredImageSrc(image);
+  const local = localImageSrc(image);
+  return preferred === local ? image.url : local;
+}
+
 function renderGallery(target) {
   if (!target.images.length) {
     return `<div class="no-images">No image files were exposed for this map target.</div>`;
@@ -213,10 +229,17 @@ function renderGallery(target) {
   return `
     <div class="gallery">
       ${target.images.map((image, index) => {
-        const imageSrc = image.url || image.src;
+        const imageSrc = preferredImageSrc(image);
+        const fallbackSrc = fallbackImageSrc(image);
         return `
         <a href="${escapeHtml(imageSrc)}" target="_blank" rel="noopener noreferrer" title="Open image ${index + 1}">
-          <img src="${escapeHtml(imageSrc)}" loading="lazy" alt="${escapeHtml(target.title)} image ${index + 1}">
+          <img
+            src="${escapeHtml(imageSrc)}"
+            ${fallbackSrc ? `data-fallback-src="${escapeHtml(fallbackSrc)}"` : ""}
+            onerror="if (this.dataset.fallbackSrc && this.src !== this.dataset.fallbackSrc) { this.src = this.dataset.fallbackSrc; this.removeAttribute('data-fallback-src'); }"
+            loading="lazy"
+            alt="${escapeHtml(target.title)} image ${index + 1}"
+          >
         </a>
       `;
       }).join("")}
