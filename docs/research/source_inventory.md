@@ -2,6 +2,20 @@
 
 Pre-build research inventory for a standalone Mariupol evidence workspace. This file catalogs source targets only; no ingestion, scraping, or app build is performed in this pass.
 
+## Live Verification Addendum - 2026-07-03
+
+Checked public web targets again before the v0 build. Confirmed:
+
+- HRW/SITU/Truth Hounds published the Mariupol destruction investigation "Our City Was Gone" on 2024-02-08; keep it as the canonical NGO/spatial source target for the app.
+- SITU's Mariupol project page is "Beneath the Rubble: Documenting Devastation and Loss in Mariupol"; use it as a partner/data-permission target, not an assumed open geodata feed.
+- UNOSAT has Mariupol-specific product pages, including `products/3300` for a Mariupol building damage assessment and `products/3358` for Azovstal. HDX also indexes a UNOSAT Livoberezhnyi District damage overview map. These should move from generic gap to named import candidates.
+- OSCE's first Moscow Mechanism expert report remains a legal anchor for IHL/IHRL, war crimes, and crimes-against-humanity analysis in Ukraine since 2022-02-24.
+- Amnesty's "CHILDREN" theatre-strike investigation remains the incident anchor for the Drama Theatre memo, with casualty ranges handled as disputed and source-bound.
+- OHCHR maintains a dedicated Mariupol update plus HRMMU reports; use them for official casualty caveats and access/occupation context.
+- ICC's Ukraine situation page remains the legal source anchor for public case/warrant metadata; do not imply a Mariupol-specific ICC finding unless a cited ICC document says so.
+- RD4U reported on 2026-04-30 that the Register had surpassed 45,000 recorded claims and opened additional claim categories. Use RD4U as claims-framework context, not as an evidence feed.
+- Meta currently documents Page Public Content Access and the Meta Content Library/API as the compliant public-content paths. Facebook ingestion should stay disabled unless page-owner export, Graph API approval, or approved research access is available.
+
 ## Priority Source Targets
 
 | Priority | Source | URL | Category | Import Value | Notes |

@@ -3,45 +3,71 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mariupol Casefile Map</title>
+    <title>Mariupol Casefile</title>
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=casefile-v0-20260703b">
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <div class="topbar-kicker">OSINT / PUBLIC MAP INGEST</div>
-        <h1>Mariupol Casefile</h1>
-        <p>Public map targets, coordinates, descriptions, and local image evidence</p>
-      </div>
-      <div class="stats" id="stats"></div>
-    </header>
-
-    <main class="map-shell">
-      <section class="map-stage">
-        <div id="map" class="map" aria-label="Mariupol target map"></div>
-
-        <aside class="legend-panel" id="legendPanel" aria-label="Map legend">
-          <div id="legend" class="legend"></div>
-        </aside>
-
-        <aside id="detailPanel" class="detail-panel" aria-live="polite">
-          <section id="detail" class="detail">
-            <div class="empty-state">
-              <h2>Select a target</h2>
-              <p>Click any point to inspect its description, coordinates, source links, and local image gallery.</p>
-            </div>
-          </section>
-        </aside>
-
-        <div class="mobile-actions" aria-label="Mobile map controls">
-          <button id="legendToggle" type="button">Legend</button>
-          <button id="detailToggle" type="button">Details</button>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <div class="brand-title">Mariupol<br>Casefile</div>
+          <div class="brand-mark" aria-hidden="true"></div>
         </div>
-      </section>
-    </main>
+        <nav class="nav-list" id="primaryNav"></nav>
+        <div class="sidebar-note">
+          <strong>Evidence posture</strong>
+          <span>Genocide indicators track coverage, not legal conclusions.</span>
+        </div>
+        <div class="sidebar-footer">
+          <div class="status-dot"></div>
+          <div>
+            <span>Data integrity</span>
+            <strong>Demo / public-source leads</strong>
+          </div>
+        </div>
+      </aside>
 
+      <section class="workspace">
+        <header class="commandbar">
+          <label class="search-box" for="globalSearch">
+            <i data-lucide="search" aria-hidden="true"></i>
+            <input id="globalSearch" type="search" placeholder="Search evidence, incidents, locations..." autocomplete="off">
+          </label>
+          <div class="commandbar-controls">
+            <button class="control-button" id="dateRangeButton" type="button">
+              <i data-lucide="calendar-days" aria-hidden="true"></i>
+              24 Feb 2022 - 31 May 2022
+            </button>
+            <button class="control-button" id="confidenceButton" type="button">
+              <i data-lucide="filter" aria-hidden="true"></i>
+              Confidence: All
+            </button>
+            <button class="control-button accent" id="quickImportButton" type="button">
+              <i data-lucide="upload" aria-hidden="true"></i>
+              Import layer
+            </button>
+          </div>
+        </header>
+
+        <main id="view" class="view" tabindex="-1"></main>
+      </section>
+
+      <aside class="inspector" id="inspector" aria-label="Inspector panel">
+        <div class="empty-inspector">
+          <i data-lucide="panel-right-open" aria-hidden="true"></i>
+          <strong>Select a record</strong>
+          <span>Evidence, incidents, connectors, map features, and legal elements open here.</span>
+        </div>
+      </aside>
+
+      <input id="importFile" type="file" accept=".geojson,.json,.csv,.kml" hidden>
+      <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
     <script src="vendor/leaflet/leaflet.js"></script>
-    <script src="app.js?v=thumbs-20260629"></script>
+    <script src="casefile-data.js?v=casefile-v0-20260703b"></script>
+    <script src="app.js?v=casefile-v0-20260703b"></script>
   </body>
 </html>
