@@ -24,6 +24,21 @@ This file documents compliant public-page discovery and ingestion paths. It does
 
 Use normal web search and official-site links to confirm exact page URLs before ingestion. Search results may vary by region and language.
 
+Live access note, 2026-07-03: Meta's documented compliant routes are Page Public Content Access for approved app review and the Meta Content Library/API for approved research access. The v0 app should therefore treat Facebook connectors as disabled until an analyst supplies a page-owner export, approved Graph API configuration, or approved research-access credentials.
+
+Canonical target labels to use in the app while exact page URLs are pending:
+
+| Canonical Label | Expected Owner/Scope | Preferred Path |
+|---|---|---|
+| Mariupol City Council / Mariupolska miska rada | Official municipal public communications | Page-owner export first; Graph API only if approved |
+| I Mariupol / YaMariupol | Support-center network for displaced Mariupol residents | Page-owner export first; Graph API only if approved |
+| Mariupol Reborn | Recovery/reconstruction initiative | Page-owner export or partner export |
+| 0629 Mariupol | Local news archive | Website/article import first; manual social archive only if lawful |
+| Suspilne Donbas | Regional public broadcaster | Website/article import first; authorized API if needed |
+| Truth Hounds | NGO documentation updates | Partner/page-owner export |
+| Human Rights Watch Ukraine content | NGO report promotion and updates | Official HRW site first; social as secondary trail |
+| Amnesty Ukraine content | NGO updates | Official Amnesty site first; social as secondary trail |
+
 | Target | Search URL | Expected Owner/Scope | Status | Recommended Path |
 |---|---|---|---|---|
 | Mariupol City Council / Маріупольська міська рада | https://www.facebook.com/search/pages/?q=%D0%9C%D0%B0%D1%80%D1%96%D1%83%D0%BF%D0%BE%D0%BB%D1%8C%D1%81%D1%8C%D0%BA%D0%B0%20%D0%BC%D1%96%D1%81%D1%8C%D0%BA%D0%B0%20%D1%80%D0%B0%D0%B4%D0%B0 | Official municipal public communications | Exact URL verification required | Page-owner export or Graph API |
@@ -91,4 +106,3 @@ Preferred JSON shape:
 | Official public channels | Mariupol City Council, I Mariupol, Mariupol Reborn, Ukrainian authorities | Use public no-login message URLs or owner export; store message metadata and summary. |
 | Local media public channels | 0629, Suspilne Donbas, other verified outlets | Prefer website article imports; use channel posts as source trail. |
 | OSINT/archive mirrors | Internet Archive, GDELT, source-preservation mirrors | Use as preservation/provenance support, not sole verification. |
-

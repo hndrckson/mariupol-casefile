@@ -13,6 +13,9 @@
 | Layer | Preferred Source | Connector | Expected Format | Status |
 |---|---|---|---|---|
 | Building-level damage points/polygons | HRW/SITU/Truth Hounds | destruction_map_import | GeoJSON/CSV/vector tiles if licensed | Permission/public-data check required |
+| Mariupol building damage assessment | UNOSAT product 3300 | satellite_reference_import | Product page/PDF; inspect for downloadable geodata | Named public source verified 2026-07-03 |
+| Azovstal industrial site building damage assessment | UNOSAT product 3358 | satellite_reference_import | Product page/PDF; inspect for downloadable geodata | Named public source verified 2026-07-03 |
+| Livoberezhnyi District damage overview | HDX catalog entry for UNOSAT product | satellite_reference_import | PDF/catalog metadata | Public catalog target verified 2026-07-03 |
 | Public open-source destruction/victim points | MariupolDestruction.com Google My Maps | destruction_map_import, geojson_import | Public embed-derived CSV/GeoJSON | Captured 4,895 features; needs corroboration and privacy review before publication |
 | Neighborhood/zone destruction estimates | HRW/SITU/Truth Hounds; UNOSAT | destruction_map_import | GeoJSON/KML/CSV/PDF-derived table | Public report available; data layer unknown |
 | Satellite damage rasters/maps | UNOSAT, Copernicus EMS, Maxar/Planet writeups | satellite_reference_import | PDF/GeoTIFF/raster screenshots | Public-product search required |

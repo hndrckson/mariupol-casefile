@@ -5,7 +5,7 @@
 | Gap | Why It Matters | Next Step |
 |---|---|---|
 | HRW/SITU/Truth Hounds structured destruction data availability | This is the likely best building-level source for Mariupol destruction. | Inspect public report assets; contact HRW/SITU/Truth Hounds for approved GeoJSON/CSV/layer exports. |
-| UNOSAT/Copernicus Mariupol-specific product inventory | Needed for independent satellite cross-check. | Search product portals for Mariupol, Donetsk oblast, and Ukraine conflict activations; record product IDs and formats. |
+| UNOSAT/Copernicus Mariupol-specific product inventory | Needed for independent satellite cross-check. | Partially resolved 2026-07-03: UNOSAT products 3300 and 3358 plus an HDX Livoberezhnyi catalog entry are named targets. Continue Copernicus EMS search and inspect UNOSAT downloads/license terms. |
 | Exact Facebook page URLs | Search result URLs are not evidence targets. Exact official public page URLs must be confirmed. | Verify via official websites first, then normal web search; prefer page-owner export. |
 | Public Telegram channel list | Useful for official update timelines but high provenance risk. | Confirm no-login public channels and owner identity; archive message URLs only. |
 | Mediazona/FT map layer licensing | Demolition/reconstruction layers could be valuable but may be copyrighted or paywalled. | Request permission or use article-level citations only. |
@@ -13,6 +13,7 @@
 | Local Mariupol cultural/heritage archives | Cultural destruction may need separate institutions and datasets. | Identify museum/library/theatre/archive institutions in exile and public loss reports. |
 | Russian denial narrative chronology | Needed for contradiction modeling, but should not pollute evidence layers. | Build separate claim table with source labels, timestamps, and rebuttal links. |
 | Licensing matrix | Import readiness depends on reuse terms, not just public access. | Add source-level license/terms fields before any automated ingest. |
+| RD4U claim-category status | Claims framework changed after the original research pass. | Add RD4U as reparations/claims context only; do not ingest private claims or imply public access to claim evidence. |
 
 ## Blockers
 
@@ -55,4 +56,3 @@
 - Every imported source should carry: source URL, source type, access date, language, license/terms, reliability tier, and verification status.
 - The first app prototype should not depend on Facebook scraping. Social ingestion should be a later connector with explicit authorization checks.
 - Russian official denial sources should be ingested as claims for contradiction modeling, never as neutral evidence.
-

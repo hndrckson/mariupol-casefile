@@ -15,6 +15,12 @@ Status: initial public-source pack identified. No documents have been downloaded
 | ICJ Ukraine v. Russian Federation | https://www.icj-cij.org/case/182 | State responsibility and provisional measures context | Ready; background only |
 | Council of Europe Register of Damage | https://rd4u.coe.int/ | Damage claims framework for Ukraine | Ready; no private claims ingestion |
 
+## Live Verification Notes - 2026-07-03
+
+- RD4U reported on 2026-04-30 that the register had surpassed 45,000 recorded claims and opened additional categories. Treat this as reparations/claims-system context only; the app should not imply access to private claim evidence.
+- ICC's Ukraine situation page describes the investigation as opened on 2022-03-02 and covering alleged crimes in Ukraine since 2013-11-21. Use ICC records as procedural/legal metadata and avoid Mariupol-specific inferences unless a cited ICC document explicitly supports them.
+- OHCHR's Mariupol update and HRMMU reports are the best official casualty-caveat sources for the dashboard's "range-bound" casualty language.
+
 ## Ukrainian Official Legal Sources
 
 | Source | URL | Scope | Status |
@@ -57,4 +63,3 @@ document_id,source_name,source_url,issuing_body,publication_date,language,docume
 - Do not convert NGO conclusions into court findings.
 - Keep Russian official denial narratives in a separate contradiction/claims table, not in the legal source pack except as cited adversarial statements.
 - Avoid personal data ingestion from victim or witness submissions unless explicitly public, necessary, and legally cleared.
-
