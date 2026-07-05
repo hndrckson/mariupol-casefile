@@ -18,6 +18,8 @@ The current workspace already has a local server listening on port 8765.
 - Real Leaflet map workspace using the captured MariupolDestruction public lead dataset.
 - Timeline, incidents, Evidence Vault, Legal Matrix, Contradictions, Report Builder, Imports/Connectors, and Settings views.
 - Inspector panel for incidents, evidence, legal elements, connectors, reports, contradictions, and map features.
+- Mobile app shell with internal scroll panes, burger navigation, scrollable chip/tool rows, and route-specific map sizing.
+- PWA manifest, local app icons, local Lucide bundle, and service worker cache shell.
 - File-import flow for GeoJSON/JSON/CSV/KML candidate layers.
 - Report exports for Markdown, HTML, evidence bundle JSON, and evidence CSV.
 - Conservative legal posture: genocide indicators are tracked as evidence coverage, not as legal conclusions.
@@ -32,6 +34,7 @@ The pre-build research prompt outputs live in `docs/research/`:
 - `facebook_public_sources.md`
 - `legal_source_pack.md`
 - `research_gaps.md`
+- `database_fill_plan.md`
 
 The research inventory was refreshed on 2026-07-03 with named UNOSAT/HDX source targets, official Meta access paths, RD4U status notes, and source-bound legal cautions.
 
@@ -42,5 +45,9 @@ Design QA artifacts:
 - `design-qa.md`
 - `docs/qa/implementation-dashboard-1280x720.png`
 - `docs/qa/dashboard-reference-vs-implementation.png`
+- `docs/qa/implementation-map-1280x720.png`
+- `docs/qa/mobile-dashboard-390x844.png`
+- `docs/qa/mobile-menu-open-390x844.png`
+- `docs/qa/mobile-map-390x844.png`
 
 Final QA result: passed.

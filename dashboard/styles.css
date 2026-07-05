@@ -30,11 +30,13 @@ html,
 body {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
   overflow: hidden;
+  overscroll-behavior: none;
   background: var(--bg);
   color: var(--ink);
   font-family: Inter, "Segoe UI", Arial, sans-serif;
@@ -51,11 +53,51 @@ button {
   cursor: pointer;
 }
 
+.view,
+.inspector,
+.legend-panel,
+.map-bottom-panel,
+.table-panel,
+.lane-events,
+.chip-list,
+.filter-row,
+.tabs,
+.segmented,
+.commandbar-controls,
+.heading-actions,
+.nav-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(137, 217, 189, 0.42) rgba(255, 255, 255, 0.04);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid rgba(5, 8, 9, 0.95);
+  border-radius: 999px;
+  background: rgba(137, 217, 189, 0.42);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--inspector-w);
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background:
     radial-gradient(circle at 24% 12%, rgba(137, 217, 189, 0.08), transparent 24%),
     linear-gradient(135deg, #050809 0%, #071014 42%, #050809 100%);
@@ -67,6 +109,11 @@ button {
   min-width: 0;
   border-right: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(8, 16, 20, 0.98), rgba(5, 8, 9, 0.98));
+}
+
+.sidebar-scrim,
+.mobile-menu-button {
+  display: none;
 }
 
 .brand {
@@ -200,13 +247,17 @@ button {
 
 .workspace {
   position: relative;
+  display: grid;
+  grid-template-rows: var(--commandbar-h) minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
   min-width: 0;
+  min-height: 0;
   overflow: hidden;
 }
 
 .commandbar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 20;
   display: grid;
   grid-template-columns: minmax(280px, 520px) minmax(0, 1fr);
@@ -299,6 +350,10 @@ button {
   padding: 0;
 }
 
+.mobile-menu-button {
+  display: none;
+}
+
 .text-link {
   min-height: 30px;
   padding: 0 8px;
@@ -308,9 +363,10 @@ button {
 }
 
 .view {
-  height: calc(100vh - var(--commandbar-h));
+  min-height: 0;
   overflow: auto;
   padding: 18px;
+  scrollbar-gutter: stable;
 }
 
 .page-heading {
@@ -352,6 +408,23 @@ button {
   border-radius: var(--radius);
   background: linear-gradient(180deg, rgba(16, 27, 32, 0.92), rgba(7, 13, 16, 0.96));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.panel,
+.summary-column,
+.evidence-stack,
+.side-stack,
+.local-panel {
+  min-width: 0;
+}
+
+.panel:has(.compact-table),
+.evidence-stack:has(.compact-table),
+.summary-column:has(.compact-table),
+.side-stack:has(.compact-table),
+.local-panel:has(.compact-table),
+.scroll-panel {
+  overflow-x: auto;
 }
 
 .metric-card {
@@ -619,7 +692,7 @@ tbody tr.is-selected,
 
 .map-workspace {
   height: 100%;
-  min-height: 720px;
+  min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 12px;
@@ -918,9 +991,15 @@ tbody tr.is-selected,
 
 .filter-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 10px;
   margin-bottom: 12px;
+  padding-bottom: 4px;
+}
+
+.filter-row > * {
+  flex: 0 0 auto;
 }
 
 .data-table {
@@ -991,7 +1070,9 @@ button.mini-chip:hover {
 .tabs,
 .segmented {
   display: inline-flex;
-  overflow: hidden;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
 }
@@ -1002,6 +1083,7 @@ button.mini-chip:hover {
 
 .tabs button,
 .segmented button {
+  flex: 0 0 auto;
   min-height: 38px;
   padding: 0 16px;
   border: 0;
@@ -1083,8 +1165,17 @@ button.mini-chip:hover {
 
 .chip-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
   gap: 6px;
+  padding-bottom: 4px;
+}
+
+.chip,
+.mini-chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .chip {
@@ -1432,6 +1523,9 @@ button.mini-chip:hover {
 
 .inspector {
   min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  height: 100dvh;
   overflow: auto;
   border-width: 0 0 0 1px;
   border-radius: 0;
@@ -1645,74 +1739,141 @@ button.mini-chip:hover {
 
 @media (max-width: 980px) {
   body {
-    overflow: auto;
+    overflow: hidden;
   }
 
   .app-shell {
-    display: block;
-    min-height: 100vh;
-    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) clamp(188px, 28dvh, 300px);
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sidebar {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 30;
+    bottom: 0;
+    left: 0;
+    z-index: 90;
+    width: min(84vw, 326px);
+    transform: translateX(-102%);
+    border-right: 1px solid var(--line);
+    border-bottom: 0;
+    box-shadow: var(--shadow);
+    transition: transform 180ms ease;
+  }
+
+  .app-shell.nav-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
     display: block;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.54);
+    transition: opacity 180ms ease;
+  }
+
+  .app-shell.nav-open .sidebar-scrim {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .brand {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 14px;
+    padding: 20px 18px 16px;
   }
 
   .brand-title {
-    font-size: 17px;
+    font-size: 19px;
   }
 
-  .brand-mark,
-  .sidebar-note,
-  .sidebar-footer {
-    display: none;
+  .brand-mark {
+    width: 78px;
+    height: 34px;
+    margin-top: 16px;
   }
 
   .nav-list {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding: 6px 10px 10px;
+    display: grid;
+    overflow-y: auto;
+    padding: 12px 8px;
   }
 
   .nav-item {
-    grid-template-columns: 20px auto;
-    min-width: max-content;
+    grid-template-columns: 24px minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .sidebar-note {
+    display: block;
+  }
+
+  .sidebar-footer {
+    display: grid;
+  }
+
+  .workspace {
+    grid-row: 1;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: auto;
+    min-height: 0;
   }
 
   .commandbar {
-    position: sticky;
-    top: 94px;
-    grid-template-columns: 1fr;
+    position: relative;
+    top: auto;
+    grid-template-columns: 40px minmax(0, 1fr);
     height: auto;
+    min-height: 104px;
+    align-content: start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
   }
 
   .commandbar-controls {
+    grid-column: 1 / -1;
+    flex-wrap: nowrap;
     justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+
+  .commandbar .control-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .view {
     height: auto;
-    min-height: 70vh;
-    overflow: visible;
-    padding: 14px;
+    min-height: 0;
+    overflow: auto;
+    padding: 12px;
   }
 
   .inspector {
+    grid-row: 2;
+    height: auto;
+    min-height: 0;
     border-top: 1px solid var(--line);
     border-left: 0;
+  }
+
+  .toast-region {
+    right: 12px;
+    left: 12px;
+    bottom: calc(clamp(188px, 28dvh, 300px) + 12px);
   }
 
   .metric-grid,
@@ -1727,25 +1888,48 @@ button.mini-chip:hover {
   }
 
   .map-toolbar {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+  }
+
+  .map-toolbar .search-box {
+    flex: 0 0 min(320px, 82vw);
+  }
+
+  .map-toolbar .select-control {
+    flex: 0 0 210px;
+  }
+
+  .map-toolbar .control-button {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
   }
 
   .map-workspace {
-    min-height: 860px;
+    min-height: 0;
   }
 
   .case-map {
-    inset: 0 0 250px 0;
+    inset: 0 0 168px 0;
   }
 
   .legend-panel {
-    width: min(260px, calc(100% - 28px));
+    width: min(246px, calc(100% - 28px));
+    max-height: calc(100% - 194px);
   }
 
   .map-bottom-panel {
     grid-template-columns: 1fr;
-    height: 250px;
+    height: 168px;
     overflow: auto;
+  }
+
+  .app-shell[data-route="map"] {
+    grid-template-rows: minmax(0, 1fr) clamp(156px, 22dvh, 242px);
   }
 
   .timeline-scale {
@@ -1758,6 +1942,14 @@ button.mini-chip:hover {
 }
 
 @media (max-width: 640px) {
+  .app-shell {
+    grid-template-rows: minmax(0, 1fr) clamp(154px, 24dvh, 226px);
+  }
+
+  .app-shell[data-route="map"] {
+    grid-template-rows: minmax(0, 1fr) clamp(126px, 18dvh, 190px);
+  }
+
   .metric-grid,
   .connector-metrics,
   .run-steps {
@@ -1776,31 +1968,55 @@ button.mini-chip:hover {
     min-height: 300px;
   }
 
-  .control-button {
+  .app-shell[data-route="map"] .case-map {
+    inset: 0 0 146px 0;
+  }
+
+  .app-shell[data-route="map"] .legend-panel {
+    width: min(224px, calc(100% - 28px));
+    max-height: 154px;
+    padding: 10px;
+  }
+
+  .app-shell[data-route="map"] .legend-group {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .app-shell[data-route="map"] .map-bottom-panel {
+    height: 146px;
+  }
+
+  .page-heading .control-button,
+  .button-row .control-button {
     width: 100%;
   }
 
   .heading-actions,
   .commandbar-controls {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 4px;
   }
 
   .tabs,
   .segmented {
-    display: grid;
+    display: flex;
     width: 100%;
+    overflow-x: auto;
   }
 
   .tabs button,
   .segmented button {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-bottom: 0;
   }
 
   .tabs button:last-child,
   .segmented button:last-child {
-    border-bottom: 0;
+    border-right: 0;
   }
 
   .data-table,
@@ -1815,5 +2031,6 @@ button.mini-chip:hover {
   .toast-region {
     right: 12px;
     left: 12px;
+    bottom: calc(clamp(154px, 24dvh, 226px) + 12px);
   }
 }

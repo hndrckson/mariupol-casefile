@@ -3,13 +3,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#050809">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Mariupol Casefile">
     <title>Mariupol Casefile</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-    <link rel="stylesheet" href="styles.css?v=casefile-v0-20260703b">
+    <link rel="stylesheet" href="styles.css?v=casefile-v0-20260705-mobile4">
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar" aria-label="Primary navigation">
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
         <div class="brand">
           <div class="brand-title">Mariupol<br>Casefile</div>
           <div class="brand-mark" aria-hidden="true"></div>
@@ -27,9 +33,13 @@
           </div>
         </div>
       </aside>
+      <div class="sidebar-scrim" id="sidebarScrim" data-menu-close aria-hidden="true"></div>
 
       <section class="workspace">
         <header class="commandbar">
+          <button class="icon-button mobile-menu-button" id="mobileMenuButton" type="button" data-menu-toggle aria-label="Open navigation" aria-controls="primaryNav" aria-expanded="false">
+            <i data-lucide="menu" aria-hidden="true"></i>
+          </button>
           <label class="search-box" for="globalSearch">
             <i data-lucide="search" aria-hidden="true"></i>
             <input id="globalSearch" type="search" placeholder="Search evidence, incidents, locations..." autocomplete="off">
@@ -65,9 +75,9 @@
       <div class="toast-region" id="toastRegion" aria-live="polite"></div>
     </div>
 
-    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="vendor/lucide/lucide.min.js" defer></script>
     <script src="vendor/leaflet/leaflet.js"></script>
-    <script src="casefile-data.js?v=casefile-v0-20260703b"></script>
-    <script src="app.js?v=casefile-v0-20260703b"></script>
+    <script src="casefile-data.js?v=casefile-v0-20260705-mobile4"></script>
+    <script src="app.js?v=casefile-v0-20260705-mobile4"></script>
   </body>
 </html>

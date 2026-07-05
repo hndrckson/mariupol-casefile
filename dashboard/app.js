@@ -66,12 +66,14 @@ const state = {
 const els = {};
 
 function initElements() {
+  els.shell = document.getElementById("appShell");
   els.view = document.getElementById("view");
   els.nav = document.getElementById("primaryNav");
   els.inspector = document.getElementById("inspector");
   els.search = document.getElementById("globalSearch");
   els.importFile = document.getElementById("importFile");
   els.quickImportButton = document.getElementById("quickImportButton");
+  els.menuButton = document.getElementById("mobileMenuButton");
   els.toastRegion = document.getElementById("toastRegion");
 }
 
@@ -158,6 +160,22 @@ function renderNav() {
   `).join("");
 }
 
+function setMobileMenu(open) {
+  if (!els.shell || !els.menuButton) return;
+  els.shell.classList.toggle("nav-open", open);
+  els.menuButton.setAttribute("aria-expanded", String(open));
+}
+
+function closeMobileMenu() {
+  setMobileMenu(false);
+}
+
+function resetViewScroll() {
+  if (!els.view) return;
+  els.view.scrollTop = 0;
+  els.view.scrollLeft = 0;
+}
+
 function setHash(route) {
   if (window.location.hash.replace("#", "") !== route) {
     window.location.hash = route;
@@ -168,10 +186,13 @@ function setHash(route) {
 
 function navigate(route) {
   state.route = route || "dashboard";
+  if (els.shell) els.shell.dataset.route = state.route;
+  closeMobileMenu();
   cleanupMaps();
   renderNav();
   renderRoute();
   renderIcons();
+  resetViewScroll();
   els.view.focus({ preventScroll: true });
 }
 
@@ -314,7 +335,7 @@ function renderDashboard() {
         </div>
       </article>
 
-      <article class="panel">
+      <article class="panel scroll-panel">
         <div class="panel-header">
           <h2>Latest imports</h2>
           <button class="text-link" type="button" data-route="admin">View runs</button>
@@ -348,7 +369,7 @@ function renderDashboard() {
         </div>
       </article>
 
-      <article class="panel">
+      <article class="panel scroll-panel">
         <div class="panel-header">
           <h2>Evidence decay risk</h2>
           <button class="text-link" type="button" data-route="evidence">Review evidence</button>
@@ -496,6 +517,7 @@ function initCaseMap() {
   drawIncidentMarkers();
   const bounds = state.targets.slice(0, 900).map((target) => [target.lat, target.lng]);
   if (bounds.length) state.map.fitBounds(bounds, { padding: [28, 28], maxZoom: 12 });
+  setTimeout(() => state.map?.invalidateSize(), 120);
 }
 
 function drawMapTargets() {
@@ -530,21 +552,23 @@ function drawMapTargets() {
 function drawIncidentMarkers() {
   if (!state.incidentLayer) return;
   state.incidentLayer.clearLayers();
-  seed.incidents.forEach((incident) => {
-    const marker = L.circleMarker(incident.location, {
-      radius: incident.severity === "Critical" ? 9 : 7,
-      color: "#f7f0e6",
-      weight: 1.5,
-      fillColor: incident.severity === "Critical" ? "#e05243" : "#f09343",
-      fillOpacity: 0.96,
+  seed.incidents
+    .filter((incident) => !state.search || lowerSearch(`${incident.title} ${incident.type} ${incident.district} ${incident.confidence}`).includes(state.search))
+    .forEach((incident) => {
+      const marker = L.circleMarker(incident.location, {
+        radius: incident.severity === "Critical" ? 9 : 7,
+        color: "#f7f0e6",
+        weight: 1.5,
+        fillColor: incident.severity === "Critical" ? "#e05243" : "#f09343",
+        fillOpacity: 0.96,
+      });
+      marker.on("click", () => {
+        state.selectedIncidentId = incident.id;
+        openIncidentInspector(incident.id);
+      });
+      marker.bindTooltip(`<strong>${escapeHtml(incident.title)}</strong><br>${escapeHtml(incident.confidence)} confidence`);
+      state.incidentLayer.addLayer(marker);
     });
-    marker.on("click", () => {
-      state.selectedIncidentId = incident.id;
-      openIncidentInspector(incident.id);
-    });
-    marker.bindTooltip(`<strong>${escapeHtml(incident.title)}</strong><br>${escapeHtml(incident.confidence)} confidence`);
-    state.incidentLayer.addLayer(marker);
-  });
 }
 
 function renderTimeline() {
@@ -655,7 +679,7 @@ function renderIncidentDetail(incident) {
           <div class="summary-item">${icon("landmark")}<span>Protected site<strong>${escapeHtml(incident.protectedSite)}</strong></span></div>
           <div class="warning-box">Genocide indicator review: evidence coverage only. Intent not determined.</div>
         </div>
-        <div class="evidence-stack">
+        <div class="evidence-stack scroll-panel">
           <h3>Evidence stack</h3>
           <table class="compact-table">
             <thead><tr><th>ID</th><th>Type</th><th>Title</th><th>Reliability</th><th>Claims</th><th>Status</th></tr></thead>
@@ -927,7 +951,7 @@ function renderAdmin() {
       </div>
     </section>
     <section class="admin-grid">
-      <article class="panel connector-list">
+      <article class="panel connector-list scroll-panel">
         <div class="panel-header"><h2>Connectors</h2><span class="badge">${seed.connectors.length}</span></div>
         <table class="compact-table">
           <thead><tr><th>Connector</th><th>Status</th><th>Mode</th><th>Last run</th><th>Records</th><th>Failures</th><th>Actions</th></tr></thead>
@@ -949,7 +973,7 @@ function renderAdmin() {
       <article class="panel connector-detail">
         ${renderConnectorDetail(selected)}
       </article>
-      <article class="panel import-runs">
+      <article class="panel import-runs scroll-panel">
         <div class="panel-header"><h2>Recent import runs</h2><button class="text-link" type="button">View all</button></div>
         <table class="compact-table">
           <thead><tr><th>Started</th><th>Connector</th><th>Run ID</th><th>Status</th><th>Records</th><th>Failures</th><th>Duration</th><th>Started by</th></tr></thead>
@@ -1375,9 +1399,19 @@ function runConnector(id, dry = false) {
 
 function bindEvents() {
   document.addEventListener("click", (event) => {
+    const menuButton = event.target.closest("[data-menu-toggle]");
+    if (menuButton) {
+      setMobileMenu(!els.shell?.classList.contains("nav-open"));
+      return;
+    }
+    if (event.target.closest("[data-menu-close]")) {
+      closeMobileMenu();
+      return;
+    }
     const routeButton = event.target.closest("[data-route]");
     if (routeButton) {
       setHash(routeButton.dataset.route);
+      closeMobileMenu();
       return;
     }
     const evidenceButton = event.target.closest("[data-evidence]");
@@ -1436,6 +1470,14 @@ function bindEvents() {
       renderIcons();
       return;
     }
+    if (event.target.closest("#mapFitButton") && state.map) {
+      const bounds = state.targets
+        .filter((target) => state.visibleCategory === "all" || target.category === state.visibleCategory)
+        .slice(0, 900)
+        .map((target) => [target.lat, target.lng]);
+      if (bounds.length) state.map.fitBounds(bounds, { padding: [28, 28], maxZoom: 12 });
+      return;
+    }
     const importButton = event.target.closest("[data-import]");
     if (importButton || event.target.closest("#quickImportButton")) {
       els.importFile.click();
@@ -1469,6 +1511,23 @@ function bindEvents() {
     }
   });
 
+  document.addEventListener("input", (event) => {
+    if (event.target.matches("#mapSearch")) {
+      state.search = lowerSearch(event.target.value.trim());
+      els.search.value = event.target.value;
+      drawMapTargets();
+      drawIncidentMarkers();
+    }
+  });
+
+  document.addEventListener("change", (event) => {
+    if (event.target.matches("#categoryFilter")) {
+      state.visibleCategory = event.target.value;
+      renderMapWorkspace();
+      renderIcons();
+    }
+  });
+
   els.search.addEventListener("input", () => {
     state.search = lowerSearch(els.search.value.trim());
     renderRoute();
@@ -1481,6 +1540,27 @@ function bindEvents() {
   });
 
   window.addEventListener("hashchange", () => navigate(routeFromHash()));
+  window.addEventListener("resize", () => {
+    state.map?.invalidateSize();
+    state.miniMap?.invalidateSize();
+  });
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMobileMenu();
+  });
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator) || window.location.protocol === "file:") return;
+  const register = () => {
+    navigator.serviceWorker.register("sw.js").catch((error) => {
+      console.warn("Service worker registration failed", error);
+    });
+  };
+  if (document.readyState === "complete") {
+    register();
+  } else {
+    window.addEventListener("load", register, { once: true });
+  }
 }
 
 async function loadTargets() {
@@ -1510,6 +1590,7 @@ async function init() {
   await loadTargets();
   navigate(routeFromHash());
   renderIcons();
+  registerServiceWorker();
 }
 
 init();
