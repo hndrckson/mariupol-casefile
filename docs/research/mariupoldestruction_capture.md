@@ -62,6 +62,10 @@ Capture date: 2026-06-29
 
 The target content export preserves map target title, description text where present, coordinates, layer, inferred class, source URL, My Maps URL, image URL list, video URL list, and other source/project links. The media manifest expands image/video URLs one row per media item.
 
+## Dashboard Resource Matrix
+
+The dashboard now exposes the capture through `seed.resourceCollections` and the `Resources` route. It models the original map as a source archive, each inferred class as a source layer, and the website navigation/resources pages as original-site sections. Counts shown in the UI are source-capture counts for triage and corroboration planning; they are not final verified damage, casualty, or legal findings.
+
 ## Inferred Classes
 
 These classes are inferred from layer names and explicit title text. They should be treated as import labels, not final legal findings.

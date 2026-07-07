@@ -12,6 +12,7 @@ The new overlay lives in `dashboard/casefile-extra-data.js` and is loaded after 
 - 3 additional incident/pattern records.
 - 2 additional contradiction records.
 - 3 additional legal matrix entries.
+- 14 resource/source collections for original-site sections, map layers, sensitivity posture, and case/evidence/legal coverage.
 - A research import run and new source gaps.
 
 The original MariupolDestruction capture remains the core map lead source:
@@ -20,6 +21,18 @@ The original MariupolDestruction capture remains the core map lead source:
 - 4,837 point features shown in the map workspace.
 - 10,593 locally downloaded public hosted image references.
 - Source-owner export and reuse terms still need outreach before treating the map as a production evidence feed.
+
+## Resource Matrix Added
+
+The second database increment adds a `Resources` route and a `seed.resourceCollections` matrix. The original website is now modeled as a primary source family instead of only a source link:
+
+| Resource group | Count | Role |
+|---|---:|---|
+| Original source | 1 | MariupolDestruction public map and submission archive as the lead-source backbone. |
+| Original map layer | 11 | Residential damage, graves/victim places, battle/routes, demolition, commerce, humanitarian problems, schools, hospitals, culture/sport, churches, and public institutions. |
+| Original site section | 2 | Website section index and original resources/follow-on reporting hub. |
+
+Layer counts come from the local `docs/research/mariupoldestruction_capture.md` and processed My Maps summaries. They are displayed as source-capture counts, not final legal findings or verified casualty/damage totals.
 
 ## Source Hierarchy
 

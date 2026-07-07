@@ -46,3 +46,13 @@ This gives the dashboard enough density for realistic product testing while keep
 - Added a research overlay with curated cases, sources, evidence, incidents, legal elements, contradictions, and import metadata.
 - Kept the original MariupolDestruction website/map as the backbone lead source.
 - Added `docs/research/deep_database_research.md` to record source hierarchy, data-quality rules, and next research sprint.
+
+## Implemented Resources Increment - 2026-07-07
+
+- Added a `Resources` route to make the source/resource layer first-class.
+- Added 14 `resourceCollections` records to the overlay:
+  - 1 original map/source archive record.
+  - 11 original-map layer records with category counts, media-reference counts, privacy posture, linked cases, evidence IDs, and legal-element IDs.
+  - 2 original website section records for the site index and resources/follow-on reporting hub.
+- Added a source register showing source tier, status, and current case/incident/evidence coverage.
+- Kept sensitive graves/victim and humanitarian layers in aggregate-public posture pending row-level redaction.

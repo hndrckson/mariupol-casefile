@@ -3,6 +3,7 @@ const seed = window.CASEFILE_SEED;
 const navItems = [
   { route: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
   { route: "cases", label: "Cases", icon: "briefcase-business" },
+  { route: "resources", label: "Resources", icon: "library" },
   { route: "map", label: "Map", icon: "map" },
   { route: "timeline", label: "Timeline", icon: "clock-3" },
   { route: "incidents", label: "Incidents", icon: "triangle-alert" },
@@ -52,6 +53,7 @@ const state = {
   importedFiles: [],
   selectedEvidenceId: "E-0041",
   selectedCaseId: "CASE-DRAMA",
+  selectedResourceId: "RES-MD-ORIGINAL-MAP",
   selectedIncidentId: "INC-DRAMA",
   selectedLegalId: "L-06",
   selectedConnectorId: "facebook_admin_export",
@@ -111,6 +113,10 @@ function caseById(id) {
   return (seed.cases || []).find((item) => item.id === id);
 }
 
+function resourceById(id) {
+  return (seed.resourceCollections || []).find((item) => item.id === id);
+}
+
 function incidentById(id) {
   return seed.incidents.find((item) => item.id === id);
 }
@@ -125,6 +131,22 @@ function connectorById(id) {
 
 function sourceById(id) {
   return seed.sources.find((item) => item.id === id);
+}
+
+function sourceCoverageStats(sourceId) {
+  const evidenceIds = new Set(seed.evidence.filter((item) => item.sourceId === sourceId).map((item) => item.id));
+  const cases = (seed.cases || []).filter((item) => (
+    (item.sourceIds || []).includes(sourceId) ||
+    (item.evidenceIds || []).some((id) => evidenceIds.has(id))
+  ));
+  const incidentIds = new Set();
+  cases.forEach((item) => (item.incidentIds || []).forEach((id) => incidentIds.add(id)));
+  seed.incidents.forEach((item) => {
+    if ((item.evidenceIds || []).some((id) => evidenceIds.has(id))) {
+      incidentIds.add(item.id);
+    }
+  });
+  return { evidence: evidenceIds.size, cases: cases.length, incidents: incidentIds.size };
 }
 
 function confidenceClass(value) {
@@ -225,6 +247,7 @@ function renderRoute() {
   const routes = {
     dashboard: renderDashboard,
     cases: renderCases,
+    resources: renderResources,
     map: renderMapWorkspace,
     timeline: renderTimeline,
     incidents: renderIncidents,
@@ -246,6 +269,23 @@ function matchesSearch(record, fields) {
   if (!state.search) return true;
   const haystack = fields.map((field) => lowerSearch(record[field])).join(" ");
   return haystack.includes(state.search);
+}
+
+function matchesResource(item) {
+  if (!state.search) return true;
+  const text = [
+    item.title,
+    item.group,
+    item.status,
+    item.privacy,
+    item.use,
+    item.caveat,
+    item.next,
+    item.mapCategory,
+    labelFor(item.mapCategory),
+    ...(item.urls || []),
+  ].map(lowerSearch).join(" ");
+  return text.includes(state.search);
 }
 
 function toast(message) {
@@ -286,6 +326,7 @@ function renderDashboard() {
       </div>
       <div class="heading-actions">
         <button class="control-button" type="button" data-route="cases">${icon("briefcase-business")} Open cases</button>
+        <button class="control-button" type="button" data-route="resources">${icon("library")} Source resources</button>
         <button class="control-button accent" type="button" data-route="map">${icon("map")} Open map workspace</button>
       </div>
     </section>
@@ -472,6 +513,151 @@ function renderCaseDetail(item) {
         <a class="source-card" href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">
           <strong>${escapeHtml(source.name)}</strong>
           <span>Tier ${escapeHtml(source.tier)} - ${escapeHtml(source.type)}</span>
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderResources() {
+  const resources = (seed.resourceCollections || [])
+    .filter(matchesResource)
+    .sort((a, b) => b.records - a.records || a.title.localeCompare(b.title));
+  const sourceRows = seed.sources
+    .filter((item) => matchesSearch(item, ["name", "type", "tier", "status", "url"]))
+    .sort((a, b) => a.tier.localeCompare(b.tier) || a.name.localeCompare(b.name));
+  const selected = resourceById(state.selectedResourceId) || resources[0] || (seed.resourceCollections || [])[0];
+  if (selected) state.selectedResourceId = selected.id;
+  const original = resourceById("RES-MD-ORIGINAL-MAP");
+  const totalLayerRows = (seed.resourceCollections || [])
+    .filter((item) => item.group === "Original map layer")
+    .reduce((sum, item) => sum + (item.records || 0), 0);
+  const sensitiveRows = (seed.resourceCollections || [])
+    .filter((item) => String(item.privacy || "").toLowerCase().includes("high"))
+    .reduce((sum, item) => sum + (item.records || 0), 0);
+
+  els.view.innerHTML = `
+    <section class="page-heading">
+      <div>
+        <h1>Resources</h1>
+        <p>Original-site resource layers, corroboration sources, source status, and case-file coverage.</p>
+      </div>
+      <div class="heading-actions">
+        <button class="control-button" type="button" data-route="cases">${icon("briefcase-business")} Case files</button>
+        <button class="control-button" type="button" data-route="evidence">${icon("folder-open")} Evidence vault</button>
+        <button class="control-button accent" type="button" data-route="map">${icon("map")} Map leads</button>
+      </div>
+    </section>
+    <section class="resource-layout">
+      <div class="resource-main">
+        <div class="resource-stat-strip">
+          ${metricCard("Original map features", formatNumber(original?.records || state.targetSummary?.totalTargets || 0), "Public lead capture", "map-pin", "mint")}
+          ${metricCard("Source resources", seed.demoStats.resources || (seed.resourceCollections || []).length, "Collections and source sections", "library", "critical")}
+          ${metricCard("Layer-class rows", formatNumber(totalLayerRows), "Map-layer taxonomy", "layers", "mint")}
+          ${metricCard("Sensitive leads", formatNumber(sensitiveRows), "Aggregate-public only", "lock-keyhole", "amber")}
+        </div>
+        <div class="resource-grid">
+          ${resources.map((item) => {
+            const linkedCases = (item.linkedCaseIds || []).length;
+            const linkedEvidence = (item.evidenceIds || []).length;
+            const badgeTone = String(item.privacy || "").toLowerCase().includes("high") ? "amber" : item.group.includes("Original") ? "mint" : "high";
+            return `
+              <article class="resource-card ${state.selectedResourceId === item.id ? "is-selected" : ""}">
+                <button class="resource-card-main" type="button" data-resource="${item.id}">
+                  <span class="badge ${badgeTone}">${escapeHtml(item.group)}</span>
+                  <h2>${escapeHtml(item.title)}</h2>
+                  <p>${escapeHtml(item.use)}</p>
+                  <div class="resource-records">
+                    <strong>${formatNumber(item.records || 0)}</strong>
+                    <span>${item.mapCategory === "all" ? "source entries" : escapeHtml(labelFor(item.mapCategory))}</span>
+                  </div>
+                  <div class="resource-card-meta">
+                    <span>${icon("image")} ${formatNumber(item.mediaAssets || 0)} media refs</span>
+                    <span>${icon("briefcase-business")} ${linkedCases} cases</span>
+                    <span>${icon("file-stack")} ${linkedEvidence} evidence</span>
+                  </div>
+                </button>
+                <div class="chip-list">
+                  <span class="chip">${escapeHtml(item.status)}</span>
+                  <span class="chip">${escapeHtml(item.privacy)}</span>
+                </div>
+              </article>
+            `;
+          }).join("")}
+        </div>
+        <article class="panel resource-source-register">
+          <div class="panel-header">
+            <div>
+              <h2>Source Register</h2>
+              <p>Public source rows with current case, incident, and evidence coverage.</p>
+            </div>
+          </div>
+          <table class="compact-table source-register-table">
+            <thead><tr><th>Source</th><th>Tier</th><th>Coverage</th><th>Status</th></tr></thead>
+            <tbody>
+              ${sourceRows.map((source) => {
+                const coverage = sourceCoverageStats(source.id);
+                return `
+                  <tr>
+                    <td>
+                      <button class="source-register-name" type="button" data-source="${source.id}">
+                        <strong>${escapeHtml(source.name)}</strong>
+                        <span>${escapeHtml(source.type)}</span>
+                      </button>
+                    </td>
+                    <td><span class="badge ${source.tier === "A" ? "high" : source.tier === "B" ? "mint" : "amber"}">Tier ${escapeHtml(source.tier)}</span></td>
+                    <td>${coverage.cases} cases / ${coverage.incidents} incidents / ${coverage.evidence} evidence</td>
+                    <td>${escapeHtml(source.status)}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </article>
+      </div>
+      <aside class="local-panel resource-detail-panel">
+        ${selected ? renderResourceDetail(selected) : ""}
+      </aside>
+    </section>
+  `;
+  if (selected) openResourceInspector(selected.id);
+}
+
+function renderResourceDetail(item) {
+  const source = sourceById(item.sourceId);
+  const cases = (item.linkedCaseIds || []).map(caseById).filter(Boolean);
+  const evidence = (item.evidenceIds || []).map(evidenceById).filter(Boolean);
+  const legal = (item.legalElementIds || []).map(legalById).filter(Boolean);
+  return `
+    <h2>${escapeHtml(item.title)}</h2>
+    <p class="muted">${escapeHtml(item.status)} - ${escapeHtml(item.privacy)}</p>
+    <p class="inspector-note">${escapeHtml(item.caveat)}</p>
+    <dl class="kv-list">
+      <div><dt>Records</dt><dd>${formatNumber(item.records || 0)}</dd></div>
+      <div><dt>Media refs</dt><dd>${formatNumber(item.mediaAssets || 0)}</dd></div>
+      <div><dt>Map class</dt><dd>${escapeHtml(item.mapCategory === "all" ? "All / source index" : labelFor(item.mapCategory))}</dd></div>
+      <div><dt>Source</dt><dd>${escapeHtml(source?.name || item.sourceId)}</dd></div>
+    </dl>
+    <h3>Linked cases</h3>
+    <div class="component-list">
+      ${cases.map((caseFile) => `
+        <button class="component-row" type="button" data-case="${caseFile.id}">
+          <span>${icon("briefcase-business")}</span>
+          <strong>${escapeHtml(caseFile.title)}<small>${escapeHtml(caseFile.status)}</small></strong>
+          <b>${caseFile.priority}</b>
+        </button>
+      `).join("")}
+    </div>
+    <h3>Evidence links</h3>
+    <div class="chip-list">${evidence.map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("")}</div>
+    <h3>Legal links</h3>
+    <div class="chip-list">${legal.map((row) => `<button class="mini-chip" type="button" data-legal="${row.id}">${escapeHtml(row.id)}</button>`).join("")}</div>
+    <h3>Source URLs</h3>
+    <div class="case-source-list">
+      ${(item.urls || []).map((url, index) => `
+        <a class="source-card" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">
+          <strong>${index === 0 ? "Primary source URL" : `Source URL ${index + 1}`}</strong>
+          <span>${escapeHtml(url)}</span>
         </a>
       `).join("")}
     </div>
@@ -1229,6 +1415,84 @@ function openCaseInspector(id) {
   );
 }
 
+function openResourceInspector(id) {
+  const item = resourceById(id);
+  if (!item) return openDefaultInspector();
+  state.selectedResourceId = id;
+  const source = sourceById(item.sourceId);
+  const cases = (item.linkedCaseIds || []).map(caseById).filter(Boolean);
+  const evidence = (item.evidenceIds || []).map(evidenceById).filter(Boolean);
+  inspectorShell(
+    item.title,
+    `${item.group} - ${item.status}`,
+    `
+      <p class="inspector-note">${escapeHtml(item.use)}</p>
+      <dl class="kv-list">
+        <div><dt>Records</dt><dd>${formatNumber(item.records || 0)}</dd></div>
+        <div><dt>Media refs</dt><dd>${formatNumber(item.mediaAssets || 0)}</dd></div>
+        <div><dt>Privacy</dt><dd>${escapeHtml(item.privacy)}</dd></div>
+        <div><dt>Layer</dt><dd>${escapeHtml(item.layerId || "source section")}</dd></div>
+      </dl>
+      <div class="status-block">
+        <strong>Evidence caveat</strong>
+        <span>${escapeHtml(item.caveat)}</span>
+      </div>
+      <h3>Next research action</h3>
+      <p class="inspector-note">${escapeHtml(item.next)}</p>
+      <h3>Linked cases</h3>
+      <div class="chip-list">${cases.map((caseFile) => `<button class="mini-chip" type="button" data-case="${caseFile.id}">${escapeHtml(caseFile.id)}</button>`).join("")}</div>
+      <h3>Evidence</h3>
+      <div class="chip-list">${evidence.map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("")}</div>
+      <div class="source-card">
+        <strong>${escapeHtml(source?.name || item.sourceId)}</strong>
+        <span>${escapeHtml(source?.type || "")}</span>
+        ${source?.url ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">Open source</a>` : ""}
+      </div>
+    `,
+    `
+      <button class="wide-action accent" type="button" data-route="resources">${icon("library")} Open resources</button>
+      <button class="wide-action" type="button" data-route="map">${icon("map")} View map leads</button>
+      <button class="wide-action" type="button" data-route="reports">${icon("file-plus-2")} Add to report</button>
+    `,
+  );
+}
+
+function openSourceInspector(id) {
+  const source = sourceById(id);
+  if (!source) return openDefaultInspector();
+  const coverage = sourceCoverageStats(source.id);
+  const cases = (seed.cases || []).filter((item) => (item.sourceIds || []).includes(source.id));
+  const evidence = seed.evidence.filter((item) => item.sourceId === source.id);
+  const resources = (seed.resourceCollections || []).filter((item) => item.sourceId === source.id);
+  inspectorShell(
+    source.name,
+    `Tier ${source.tier} - ${source.status}`,
+    `
+      <dl class="kv-list">
+        <div><dt>Type</dt><dd>${escapeHtml(source.type)}</dd></div>
+        <div><dt>Cases</dt><dd>${coverage.cases}</dd></div>
+        <div><dt>Incidents</dt><dd>${coverage.incidents}</dd></div>
+        <div><dt>Evidence</dt><dd>${coverage.evidence}</dd></div>
+      </dl>
+      <h3>Case coverage</h3>
+      <div class="chip-list">${cases.map((caseFile) => `<button class="mini-chip" type="button" data-case="${caseFile.id}">${escapeHtml(caseFile.id)}</button>`).join("") || `<span class="chip">No case links yet</span>`}</div>
+      <h3>Evidence rows</h3>
+      <div class="chip-list">${evidence.slice(0, 12).map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("") || `<span class="chip">No evidence rows yet</span>`}</div>
+      <h3>Resource collections</h3>
+      <div class="chip-list">${resources.slice(0, 12).map((resource) => `<button class="mini-chip" type="button" data-resource="${resource.id}">${escapeHtml(resource.id)}</button>`).join("") || `<span class="chip">No resource layer yet</span>`}</div>
+      <div class="source-card">
+        <strong>Source URL</strong>
+        <span>${escapeHtml(source.url)}</span>
+        ${source.url ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">Open source</a>` : ""}
+      </div>
+    `,
+    `
+      <button class="wide-action accent" type="button" data-route="resources">${icon("library")} Open resources</button>
+      <button class="wide-action" type="button" data-route="evidence">${icon("folder-open")} Open evidence</button>
+    `,
+  );
+}
+
 function openEvidenceInspector(id) {
   const item = evidenceById(id);
   if (!item) return openDefaultInspector();
@@ -1560,6 +1824,18 @@ function bindEvents() {
       state.selectedCaseId = caseButton.dataset.case;
       openCaseInspector(state.selectedCaseId);
       if (state.route === "cases") renderCases();
+      return;
+    }
+    const resourceButton = event.target.closest("[data-resource]");
+    if (resourceButton) {
+      state.selectedResourceId = resourceButton.dataset.resource;
+      openResourceInspector(state.selectedResourceId);
+      if (state.route === "resources") renderResources();
+      return;
+    }
+    const sourceButton = event.target.closest("[data-source]");
+    if (sourceButton) {
+      openSourceInspector(sourceButton.dataset.source);
       return;
     }
     const legalButton = event.target.closest("[data-legal]");
