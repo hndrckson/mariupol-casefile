@@ -56,3 +56,11 @@ This gives the dashboard enough density for realistic product testing while keep
   - 2 original website section records for the site index and resources/follow-on reporting hub.
 - Added a source register showing source tier, status, and current case/incident/evidence coverage.
 - Kept sensitive graves/victim and humanitarian layers in aggregate-public posture pending row-level redaction.
+
+## Implemented Map Leads Increment - 2026-07-07
+
+- Added `scripts/build_map_feature_index.py` as a repeatable generator from the processed MariupolDestruction capture.
+- Added `dashboard/casefile-map-index.js` with 300 source-bound `mapFeatureIndex` rows from the 4,895 original map features.
+- Added a `Map Leads` route with metrics, category composition, a review queue table, a local detail panel, and inspector actions.
+- Preserved privacy posture by withholding raw source titles in the public index and redacting grave/victim plus humanitarian-problem public titles and coordinates.
+- Advanced the original seed target of 300 map features without fabricating incidents or exposing sensitive source text.

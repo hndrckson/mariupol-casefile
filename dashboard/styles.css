@@ -66,7 +66,8 @@ button {
 .commandbar-controls,
 .heading-actions,
 .nav-list,
-.resource-source-register {
+.resource-source-register,
+.map-lead-table-panel {
   scrollbar-width: thin;
   scrollbar-color: rgba(137, 217, 189, 0.42) rgba(255, 255, 255, 0.04);
   overscroll-behavior: contain;
@@ -691,6 +692,89 @@ button {
   color: var(--muted);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.map-lead-layout {
+  display: grid;
+  grid-template-columns: minmax(580px, 1fr) 380px;
+  gap: 14px;
+  min-width: 0;
+}
+
+.map-lead-main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.map-lead-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.lead-category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lead-category {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--ink);
+  text-align: left;
+}
+
+.lead-category span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lead-category strong {
+  font-size: 18px;
+}
+
+.map-lead-table-panel {
+  overflow-x: auto;
+}
+
+.map-lead-table {
+  min-width: 880px;
+}
+
+.map-lead-table tr.is-selected-row td {
+  background: rgba(137, 217, 189, 0.07);
+}
+
+.map-lead-name {
+  display: grid;
+  gap: 4px;
+  max-width: 340px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+.map-lead-name span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-lead-detail-panel {
+  align-self: start;
 }
 
 .panel {
@@ -1928,6 +2012,7 @@ button.mini-chip:hover {
   .dashboard-grid,
   .case-layout,
   .resource-layout,
+  .map-lead-layout,
   .legal-layout,
   .report-layout,
   .admin-grid,
@@ -1955,6 +2040,10 @@ button.mini-chip:hover {
 
   .resource-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lead-category-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .report-list,
@@ -2104,6 +2193,7 @@ button.mini-chip:hover {
 
   .metric-grid,
   .resource-stat-strip,
+  .lead-category-grid,
   .connector-metrics,
   .run-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2179,6 +2269,7 @@ button.mini-chip:hover {
 
   .metric-grid,
   .resource-stat-strip,
+  .lead-category-grid,
   .connector-metrics,
   .run-steps {
     grid-template-columns: 1fr;

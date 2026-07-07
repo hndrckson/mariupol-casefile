@@ -4,6 +4,7 @@ const navItems = [
   { route: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
   { route: "cases", label: "Cases", icon: "briefcase-business" },
   { route: "resources", label: "Resources", icon: "library" },
+  { route: "map-leads", label: "Map Leads", icon: "map-pinned" },
   { route: "map", label: "Map", icon: "map" },
   { route: "timeline", label: "Timeline", icon: "clock-3" },
   { route: "incidents", label: "Incidents", icon: "triangle-alert" },
@@ -54,6 +55,7 @@ const state = {
   selectedEvidenceId: "E-0041",
   selectedCaseId: "CASE-DRAMA",
   selectedResourceId: "RES-MD-ORIGINAL-MAP",
+  selectedMapLeadId: "MF-44A02E8EB40004CC",
   selectedIncidentId: "INC-DRAMA",
   selectedLegalId: "L-06",
   selectedConnectorId: "facebook_admin_export",
@@ -115,6 +117,10 @@ function caseById(id) {
 
 function resourceById(id) {
   return (seed.resourceCollections || []).find((item) => item.id === id);
+}
+
+function mapLeadById(id) {
+  return (seed.mapFeatureIndex || []).find((item) => item.id === id);
 }
 
 function incidentById(id) {
@@ -248,6 +254,7 @@ function renderRoute() {
     dashboard: renderDashboard,
     cases: renderCases,
     resources: renderResources,
+    "map-leads": renderMapLeads,
     map: renderMapWorkspace,
     timeline: renderTimeline,
     incidents: renderIncidents,
@@ -284,6 +291,22 @@ function matchesResource(item) {
     item.mapCategory,
     labelFor(item.mapCategory),
     ...(item.urls || []),
+  ].map(lowerSearch).join(" ");
+  return text.includes(state.search);
+}
+
+function matchesMapLead(item) {
+  if (!state.search) return true;
+  const text = [
+    item.id,
+    item.featureId,
+    item.publicTitle,
+    item.label,
+    item.category,
+    item.privacy,
+    item.reviewStatus,
+    item.layerId,
+    item.accessMode,
   ].map(lowerSearch).join(" ");
   return text.includes(state.search);
 }
@@ -327,6 +350,7 @@ function renderDashboard() {
       <div class="heading-actions">
         <button class="control-button" type="button" data-route="cases">${icon("briefcase-business")} Open cases</button>
         <button class="control-button" type="button" data-route="resources">${icon("library")} Source resources</button>
+        <button class="control-button" type="button" data-route="map-leads">${icon("map-pinned")} Map leads</button>
         <button class="control-button accent" type="button" data-route="map">${icon("map")} Open map workspace</button>
       </div>
     </section>
@@ -526,7 +550,7 @@ function renderResources() {
   const sourceRows = seed.sources
     .filter((item) => matchesSearch(item, ["name", "type", "tier", "status", "url"]))
     .sort((a, b) => a.tier.localeCompare(b.tier) || a.name.localeCompare(b.name));
-  const selected = resourceById(state.selectedResourceId) || resources[0] || (seed.resourceCollections || [])[0];
+  const selected = resources.find((item) => item.id === state.selectedResourceId) || resources[0] || (seed.resourceCollections || [])[0];
   if (selected) state.selectedResourceId = selected.id;
   const original = resourceById("RES-MD-ORIGINAL-MAP");
   const totalLayerRows = (seed.resourceCollections || [])
@@ -660,6 +684,135 @@ function renderResourceDetail(item) {
           <span>${escapeHtml(url)}</span>
         </a>
       `).join("")}
+    </div>
+  `;
+}
+
+function renderMapLeads() {
+  const stats = seed.mapFeatureStats || {};
+  const leads = (seed.mapFeatureIndex || [])
+    .filter(matchesMapLead)
+    .sort((a, b) => b.mediaCount - a.mediaCount || a.label.localeCompare(b.label));
+  const selected = leads.find((item) => item.id === state.selectedMapLeadId) || leads[0] || (seed.mapFeatureIndex || [])[0];
+  if (selected) state.selectedMapLeadId = selected.id;
+  const mediaRefs = leads.reduce((sum, item) => sum + (item.mediaCount || 0), 0);
+  const redactions = leads.filter((item) => item.titlePolicy === "redacted_sensitive").length;
+  const categoryRows = Object.entries(stats.byClass || {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([category, count]) => ({ category, count }));
+
+  els.view.innerHTML = `
+    <section class="page-heading">
+      <div>
+        <h1>Map Leads</h1>
+        <p>Public, source-bound sample of original map features prepared for row-level review and corroboration.</p>
+      </div>
+      <div class="heading-actions">
+        <button class="control-button" type="button" data-route="resources">${icon("library")} Resources</button>
+        <button class="control-button" type="button" data-route="evidence">${icon("folder-open")} Evidence vault</button>
+        <button class="control-button accent" type="button" data-route="map">${icon("map")} Open map</button>
+      </div>
+    </section>
+    <section class="resource-stat-strip map-lead-stat-strip">
+      ${metricCard("Indexed public leads", formatNumber(stats.sampleSize || seed.mapFeatureIndex?.length || 0), "Stratified original-map sample", "map-pinned", "mint")}
+      ${metricCard("Original source rows", formatNumber(stats.targetFeatureCount || 0), "Captured My Maps features", "database", "critical")}
+      ${metricCard("Media refs in sample", formatNumber(mediaRefs), "Images/videos linked by source rows", "image", "mint")}
+      ${metricCard("Sensitive redactions", formatNumber(redactions), "Public titles and coordinates reduced", "lock-keyhole", "amber")}
+    </section>
+    <section class="map-lead-layout">
+      <div class="map-lead-main">
+        <article class="panel map-lead-summary">
+          <div class="panel-header">
+            <div>
+              <h2>Sample Composition</h2>
+              <p>${escapeHtml(stats.selectionRule || "Stratified source sample")}</p>
+            </div>
+          </div>
+          <div class="lead-category-grid">
+            ${categoryRows.map((item) => `
+              <button class="lead-category" type="button" data-map-category-filter="${escapeHtml(item.category)}">
+                <span>${escapeHtml(labelFor(item.category))}</span>
+                <strong>${formatNumber(item.count)}</strong>
+              </button>
+            `).join("")}
+          </div>
+          <div class="status-block">
+            <strong>Privacy rule</strong>
+            <span>${escapeHtml(stats.privacyRule || "Sensitive rows are redacted in public mode.")}</span>
+          </div>
+        </article>
+        <article class="panel map-lead-table-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Feature Review Queue</h2>
+              <p>${formatNumber(leads.length)} visible rows from ${formatNumber(seed.mapFeatureIndex?.length || 0)} indexed leads.</p>
+            </div>
+          </div>
+          <table class="compact-table map-lead-table">
+            <thead><tr><th>Lead</th><th>Class</th><th>Media</th><th>Privacy</th><th>Status</th></tr></thead>
+            <tbody>
+              ${leads.map((item) => `
+                <tr class="${state.selectedMapLeadId === item.id ? "is-selected-row" : ""}">
+                  <td>
+                    <button class="map-lead-name" type="button" data-map-lead="${item.id}">
+                      <strong>${escapeHtml(item.publicTitle)}</strong>
+                      <span>${escapeHtml(item.featureId)} - ${item.latitude}, ${item.longitude}</span>
+                    </button>
+                  </td>
+                  <td><span class="badge ${item.titlePolicy === "redacted_sensitive" ? "amber" : "mint"}">${escapeHtml(item.label)}</span></td>
+                  <td>${formatNumber(item.mediaCount)} media / ${formatNumber(item.linkCount)} links</td>
+                  <td>${escapeHtml(item.privacy)}</td>
+                  <td>${escapeHtml(item.reviewStatus)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </article>
+      </div>
+      <aside class="local-panel map-lead-detail-panel">
+        ${selected ? renderMapLeadDetail(selected) : ""}
+      </aside>
+    </section>
+  `;
+  if (selected) openMapLeadInspector(selected.id);
+}
+
+function renderMapLeadDetail(item) {
+  const resource = resourceById(item.resourceId);
+  const cases = (item.caseIds || []).map(caseById).filter(Boolean);
+  const evidence = (item.evidenceIds || []).map(evidenceById).filter(Boolean);
+  return `
+    <h2>${escapeHtml(item.publicTitle)}</h2>
+    <p class="muted">${escapeHtml(item.label)} - ${escapeHtml(item.reviewStatus)}</p>
+    <p class="inspector-note">${escapeHtml(item.notes)}</p>
+    <dl class="kv-list">
+      <div><dt>Feature ID</dt><dd>${escapeHtml(item.featureId)}</dd></div>
+      <div><dt>Coordinates</dt><dd>${item.latitude}, ${item.longitude}</dd></div>
+      <div><dt>Precision</dt><dd>${escapeHtml(item.coordinatePrecision)}</dd></div>
+      <div><dt>Media</dt><dd>${formatNumber(item.imageCount)} images / ${formatNumber(item.videoCount)} videos</dd></div>
+      <div><dt>Links</dt><dd>${formatNumber(item.linkCount)}</dd></div>
+      <div><dt>Layer</dt><dd>${escapeHtml(item.layerId)}</dd></div>
+    </dl>
+    <div class="status-block">
+      <strong>Public title policy</strong>
+      <span>${escapeHtml(item.titlePolicy)} - ${escapeHtml(item.privacy)}</span>
+    </div>
+    <h3>Resource collection</h3>
+    <div class="chip-list">${resource ? `<button class="mini-chip" type="button" data-resource="${resource.id}">${escapeHtml(resource.title)}</button>` : ""}</div>
+    <h3>Linked cases</h3>
+    <div class="chip-list">${cases.map((caseFile) => `<button class="mini-chip" type="button" data-case="${caseFile.id}">${escapeHtml(caseFile.id)}</button>`).join("")}</div>
+    <h3>Evidence links</h3>
+    <div class="chip-list">${evidence.map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("")}</div>
+    <h3>Source URLs</h3>
+    <div class="case-source-list">
+      <a class="source-card" href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer">
+        <strong>Original map page</strong>
+        <span>${escapeHtml(item.sourceUrl)}</span>
+      </a>
+      <a class="source-card" href="${escapeHtml(item.mymapsUrl)}" target="_blank" rel="noopener noreferrer">
+        <strong>Public My Maps viewer</strong>
+        <span>${escapeHtml(item.mymapsUrl)}</span>
+      </a>
     </div>
   `;
 }
@@ -1493,6 +1646,45 @@ function openSourceInspector(id) {
   );
 }
 
+function openMapLeadInspector(id) {
+  const item = mapLeadById(id);
+  if (!item) return openDefaultInspector();
+  state.selectedMapLeadId = id;
+  const resource = resourceById(item.resourceId);
+  const cases = (item.caseIds || []).map(caseById).filter(Boolean);
+  const evidence = (item.evidenceIds || []).map(evidenceById).filter(Boolean);
+  inspectorShell(
+    item.publicTitle,
+    `${item.label} - ${item.reviewStatus}`,
+    `
+      <p class="inspector-note">${escapeHtml(item.notes)}</p>
+      <dl class="kv-list">
+        <div><dt>Feature ID</dt><dd>${escapeHtml(item.featureId)}</dd></div>
+        <div><dt>Coordinates</dt><dd>${item.latitude}, ${item.longitude}</dd></div>
+        <div><dt>Precision</dt><dd>${escapeHtml(item.coordinatePrecision)}</dd></div>
+        <div><dt>Captured</dt><dd>${escapeHtml(item.capturedAt)}</dd></div>
+        <div><dt>Media refs</dt><dd>${formatNumber(item.mediaCount)}</dd></div>
+        <div><dt>Privacy</dt><dd>${escapeHtml(item.privacy)}</dd></div>
+      </dl>
+      <div class="status-block">
+        <strong>Source title handling</strong>
+        <span>${escapeHtml(item.titlePolicy)}. Raw source title is withheld in this public review index until row-level review.</span>
+      </div>
+      <h3>Resource</h3>
+      <div class="chip-list">${resource ? `<button class="mini-chip" type="button" data-resource="${resource.id}">${escapeHtml(resource.id)}</button>` : ""}</div>
+      <h3>Cases</h3>
+      <div class="chip-list">${cases.map((caseFile) => `<button class="mini-chip" type="button" data-case="${caseFile.id}">${escapeHtml(caseFile.id)}</button>`).join("")}</div>
+      <h3>Evidence</h3>
+      <div class="chip-list">${evidence.map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("")}</div>
+    `,
+    `
+      <button class="wide-action accent" type="button" data-route="map-leads">${icon("map-pinned")} Open review queue</button>
+      <button class="wide-action" type="button" data-route="map">${icon("map")} View full map</button>
+      <button class="wide-action" type="button" data-route="reports">${icon("file-plus-2")} Add to report</button>
+    `,
+  );
+}
+
 function openEvidenceInspector(id) {
   const item = evidenceById(id);
   if (!item) return openDefaultInspector();
@@ -1799,6 +1991,14 @@ function bindEvents() {
       closeMobileMenu();
       return;
     }
+    const mapCategoryFilter = event.target.closest("[data-map-category-filter]");
+    if (mapCategoryFilter) {
+      state.search = mapCategoryFilter.dataset.mapCategoryFilter;
+      els.search.value = state.search;
+      renderRoute();
+      renderIcons();
+      return;
+    }
     const routeButton = event.target.closest("[data-route]");
     if (routeButton) {
       setHash(routeButton.dataset.route);
@@ -1836,6 +2036,13 @@ function bindEvents() {
     const sourceButton = event.target.closest("[data-source]");
     if (sourceButton) {
       openSourceInspector(sourceButton.dataset.source);
+      return;
+    }
+    const mapLeadButton = event.target.closest("[data-map-lead]");
+    if (mapLeadButton) {
+      state.selectedMapLeadId = mapLeadButton.dataset.mapLead;
+      openMapLeadInspector(state.selectedMapLeadId);
+      if (state.route === "map-leads") renderMapLeads();
       return;
     }
     const legalButton = event.target.closest("[data-legal]");

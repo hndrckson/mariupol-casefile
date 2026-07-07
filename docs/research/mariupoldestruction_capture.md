@@ -66,6 +66,8 @@ The target content export preserves map target title, description text where pre
 
 The dashboard now exposes the capture through `seed.resourceCollections` and the `Resources` route. It models the original map as a source archive, each inferred class as a source layer, and the website navigation/resources pages as original-site sections. Counts shown in the UI are source-capture counts for triage and corroboration planning; they are not final verified damage, casualty, or legal findings.
 
+`scripts/build_map_feature_index.py` also derives a public `mapFeatureIndex` review sample from this capture. The generated dashboard overlay contains 300 source-bound rows selected by original layer and media/link density. High-sensitivity grave/victim and humanitarian rows use redacted public titles and rounded coordinates.
+
 ## Inferred Classes
 
 These classes are inferred from layer names and explicit title text. They should be treated as import labels, not final legal findings.

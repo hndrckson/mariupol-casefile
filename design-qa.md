@@ -14,9 +14,11 @@
 - Case files mobile screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\casefiles-route-mobile-390x844.png`
 - Resources desktop screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\resources-route-1280x720.png`
 - Resources mobile screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\resources-route-mobile-390x844.png`
+- Map Leads desktop screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\map-leads-route-1280x720.png`
+- Map Leads mobile screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\map-leads-route-mobile-390x844.png`
 - Full-view comparison evidence from prior reference pass: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\dashboard-reference-vs-implementation.png`
 - Viewports: 1280x720 desktop, 390x844 mobile.
-- States: Dashboard, Map, Case Files, Resources, and mobile navigation drawer.
+- States: Dashboard, Map, Case Files, Resources, Map Leads, and mobile navigation drawer.
 
 **Findings**
 - No actionable P0/P1/P2 findings remain.
@@ -26,6 +28,7 @@
 - PWA shell: passed. The app now includes a manifest, theme metadata, local PNG icons, local Lucide bundle, and a same-origin service worker cache list. In-app browser service-worker APIs were not exposed for runtime registration verification, so install behavior should still be smoke-tested in Chrome/Safari.
 - Case files route: passed. The new route renders 8 source-backed case cards, opens the selected case in the inspector, exposes source links, and preserves fixed-shell scrolling on desktop and mobile.
 - Resources route: passed. The route renders 14 resource/source collection cards and 20 source-register rows, opens the selected resource in the inspector, preserves body scroll lock, keeps source-register overflow internal, and has zero console errors on desktop and mobile.
+- Map Leads route: passed. The route renders 300 source-bound original-map review leads, 11 category chips, a source review table, and a local detail panel. Category filtering was smoke-tested with `school`, reducing the table to 12 rows and updating the inspector. Desktop and mobile preserve body scroll lock, internal table scrolling, and zero console errors.
 - Fonts and typography: passed. The implementation keeps the compact case-management hierarchy, zero letter spacing, readable dense controls, and button text that fits mobile containers.
 - Spacing and layout rhythm: passed. The desktop composition remains dense and inspector-forward; mobile uses a fixed app viewport with a short bottom inspector row and route-specific map sizing.
 - Colors and visual tokens: passed. The graphite, off-white, mint, amber, and coral tokens remain aligned with the reference language.
@@ -43,6 +46,7 @@
 - Completed: added PWA manifest, service worker, local app icons, and local Lucide bundle.
 - Completed: added the casefile route and the first deep database overlay with validated source/evidence/case links.
 - Completed: added the Resources route and original-source matrix with validated source/resource/case/evidence/legal links.
+- Completed: added the generated Map Leads route and 300-row redacted map-feature review sample with validated source/resource/case/evidence links.
 - Completed: validated desktop/mobile shell behavior with browser screenshots and zero console errors in the desktop map pass.
 
 **Follow-up Polish**
