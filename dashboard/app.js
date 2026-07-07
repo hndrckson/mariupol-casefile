@@ -2,6 +2,7 @@ const seed = window.CASEFILE_SEED;
 
 const navItems = [
   { route: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
+  { route: "cases", label: "Cases", icon: "briefcase-business" },
   { route: "map", label: "Map", icon: "map" },
   { route: "timeline", label: "Timeline", icon: "clock-3" },
   { route: "incidents", label: "Incidents", icon: "triangle-alert" },
@@ -50,6 +51,7 @@ const state = {
   targetSummary: null,
   importedFiles: [],
   selectedEvidenceId: "E-0041",
+  selectedCaseId: "CASE-DRAMA",
   selectedIncidentId: "INC-DRAMA",
   selectedLegalId: "L-06",
   selectedConnectorId: "facebook_admin_export",
@@ -103,6 +105,10 @@ function colorFor(category) {
 
 function evidenceById(id) {
   return seed.evidence.find((item) => item.id === id);
+}
+
+function caseById(id) {
+  return (seed.cases || []).find((item) => item.id === id);
 }
 
 function incidentById(id) {
@@ -218,6 +224,7 @@ function cleanupMaps() {
 function renderRoute() {
   const routes = {
     dashboard: renderDashboard,
+    cases: renderCases,
     map: renderMapWorkspace,
     timeline: renderTimeline,
     incidents: renderIncidents,
@@ -266,6 +273,7 @@ function renderDashboard() {
   const totalTargets = state.targetSummary?.totalTargets || 0;
   const verifiedEvidence = seed.evidence.filter((item) => item.status === "Reviewed").length;
   const legalAverage = Math.round(seed.legalElements.reduce((sum, item) => sum + item.confidence, 0) / seed.legalElements.length);
+  const caseCount = seed.cases?.length || 0;
   const priorityIncidents = [...seed.incidents].sort((a, b) => b.priority - a.priority).slice(0, 5);
   const latestImports = seed.imports.slice(0, 4);
   const openContradictions = seed.contradictions.filter((item) => item.status !== "Resolved").length;
@@ -277,13 +285,13 @@ function renderDashboard() {
         <p>Evidence workspace for siege, destruction, displacement, and occupation analysis.</p>
       </div>
       <div class="heading-actions">
-        <button class="control-button" type="button" data-route="reports">${icon("file-plus-2")} Build cited report</button>
+        <button class="control-button" type="button" data-route="cases">${icon("briefcase-business")} Open cases</button>
         <button class="control-button accent" type="button" data-route="map">${icon("map")} Open map workspace</button>
       </div>
     </section>
 
     <section class="metric-grid">
-      ${metricCard("Incidents", seed.demoStats.incidents, "High severity: 18", "badge-alert", "critical")}
+      ${metricCard("Case files", caseCount || seed.demoStats.cases || 0, "Curated source-backed groups", "briefcase-business", "critical")}
       ${metricCard("Evidence records", seed.demoStats.evidenceRecords, `Reviewed sample: ${verifiedEvidence}/${seed.evidence.length}`, "file-stack", "mint")}
       ${metricCard("Map features", formatNumber(totalTargets), "Captured public lead set", "map-pin", "mint")}
       ${metricCard("Contradiction sets", openContradictions, "High priority: 3", "scale", "amber")}
@@ -388,6 +396,86 @@ function renderDashboard() {
   `;
   renderDashboardMiniMap();
   openIncidentInspector(state.selectedIncidentId);
+}
+
+function renderCases() {
+  const cases = (seed.cases || [])
+    .filter((item) => matchesSearch(item, ["title", "status", "summary"]))
+    .sort((a, b) => b.priority - a.priority);
+  const selected = caseById(state.selectedCaseId) || cases[0];
+  if (selected) state.selectedCaseId = selected.id;
+
+  els.view.innerHTML = `
+    <section class="page-heading">
+      <div>
+        <h1>Case Files</h1>
+        <p>Source-backed case groupings for incidents, evidence, legal elements, contradictions, and original-map leads.</p>
+      </div>
+      <div class="heading-actions">
+        <button class="control-button" type="button" data-route="evidence">${icon("folder-open")} Evidence vault</button>
+        <button class="control-button accent" type="button" data-route="reports">${icon("file-plus-2")} Build report</button>
+      </div>
+    </section>
+    <section class="case-layout">
+      <div class="case-grid">
+        ${cases.map((item) => {
+          const reviewed = item.evidenceIds.map(evidenceById).filter((evidence) => evidence?.status === "Reviewed").length;
+          return `
+            <article class="case-card ${state.selectedCaseId === item.id ? "is-selected" : ""}">
+              <button class="case-card-main" type="button" data-case="${item.id}">
+                <span class="badge ${item.status.includes("Restricted") ? "amber" : item.status.includes("Exemplar") ? "high" : "mint"}">${escapeHtml(item.status)}</span>
+                <h2>${escapeHtml(item.title)}</h2>
+                <p>${escapeHtml(item.summary)}</p>
+                <div class="case-metrics">
+                  <span>${icon("triangle-alert")} ${item.incidentIds.length} incidents</span>
+                  <span>${icon("file-stack")} ${item.evidenceIds.length} evidence</span>
+                  <span>${icon("scale")} ${item.legalElementIds.length} legal links</span>
+                </div>
+                <div class="coverage-track"><span style="width:${Math.min(100, Math.round((reviewed / Math.max(1, item.evidenceIds.length)) * 100))}%"></span></div>
+              </button>
+              <div class="chip-list">${item.mapCategories.map((tag) => `<span class="chip">${escapeHtml(labelFor(tag))}</span>`).join("")}</div>
+            </article>
+          `;
+        }).join("")}
+      </div>
+      <aside class="local-panel case-detail-panel">
+        ${selected ? renderCaseDetail(selected) : ""}
+      </aside>
+    </section>
+  `;
+  if (selected) openCaseInspector(selected.id);
+}
+
+function renderCaseDetail(item) {
+  const incidents = item.incidentIds.map(incidentById).filter(Boolean);
+  const evidence = item.evidenceIds.map(evidenceById).filter(Boolean);
+  const sources = item.sourceIds.map(sourceById).filter(Boolean);
+  return `
+    <h2>${escapeHtml(item.title)}</h2>
+    <p class="muted">${escapeHtml(item.status)} - priority ${item.priority}</p>
+    <p class="inspector-note">${escapeHtml(item.summary)}</p>
+    <h3>Core incidents</h3>
+    <div class="component-list">
+      ${incidents.map((incident) => `
+        <button class="component-row" type="button" data-incident="${incident.id}">
+          <span>${icon("triangle-alert")}</span>
+          <strong>${escapeHtml(incident.title)}<small>${escapeHtml(incident.date)} - ${escapeHtml(incident.status)}</small></strong>
+          <b>${escapeHtml(incident.confidence)}</b>
+        </button>
+      `).join("")}
+    </div>
+    <h3>Evidence stack</h3>
+    <div class="chip-list">${evidence.map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("")}</div>
+    <h3>Sources</h3>
+    <div class="case-source-list">
+      ${sources.map((source) => `
+        <a class="source-card" href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">
+          <strong>${escapeHtml(source.name)}</strong>
+          <span>Tier ${escapeHtml(source.tier)} - ${escapeHtml(source.type)}</span>
+        </a>
+      `).join("")}
+    </div>
+  `;
 }
 
 function renderDashboardMiniMap() {
@@ -1102,6 +1190,45 @@ function openDefaultInspector() {
   );
 }
 
+function openCaseInspector(id) {
+  const item = caseById(id);
+  if (!item) return openDefaultInspector();
+  state.selectedCaseId = id;
+  const incidents = item.incidentIds.map(incidentById).filter(Boolean);
+  const evidence = item.evidenceIds.map(evidenceById).filter(Boolean);
+  const sources = item.sourceIds.map(sourceById).filter(Boolean);
+  inspectorShell(
+    item.title,
+    `${item.status} - priority ${item.priority}`,
+    `
+      <p class="inspector-note">${escapeHtml(item.summary)}</p>
+      <dl class="kv-list">
+        <div><dt>Incidents</dt><dd>${incidents.length}</dd></div>
+        <div><dt>Evidence</dt><dd>${evidence.length}</dd></div>
+        <div><dt>Legal links</dt><dd>${item.legalElementIds.length}</dd></div>
+        <div><dt>Contradictions</dt><dd>${item.contradictionIds.length}</dd></div>
+      </dl>
+      <h3>Source hierarchy</h3>
+      <div class="component-list">
+        ${sources.map((source) => `
+          <a class="component-row" href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">
+            <span>${icon(source.tier === "A" ? "shield-check" : "link")}</span>
+            <strong>${escapeHtml(source.name)}<small>Tier ${escapeHtml(source.tier)} - ${escapeHtml(source.status)}</small></strong>
+            <b>${escapeHtml(source.type.split(" ")[0] || "Source")}</b>
+          </a>
+        `).join("")}
+      </div>
+      <h3>Evidence</h3>
+      <div class="chip-list">${evidence.map((record) => `<button class="mini-chip" type="button" data-evidence="${record.id}">${record.id}</button>`).join("")}</div>
+    `,
+    `
+      <button class="wide-action accent" type="button" data-route="cases">${icon("briefcase-business")} Open case</button>
+      <button class="wide-action" type="button" data-route="reports">${icon("file-plus-2")} Add to report</button>
+      <button class="wide-action" type="button" data-route="map">${icon("map")} View map leads</button>
+    `,
+  );
+}
+
 function openEvidenceInspector(id) {
   const item = evidenceById(id);
   if (!item) return openDefaultInspector();
@@ -1426,6 +1553,13 @@ function bindEvents() {
       state.selectedIncidentId = incidentButton.dataset.incident;
       openIncidentInspector(state.selectedIncidentId);
       if (state.route === "incidents") renderIncidents();
+      return;
+    }
+    const caseButton = event.target.closest("[data-case]");
+    if (caseButton) {
+      state.selectedCaseId = caseButton.dataset.case;
+      openCaseInspector(state.selectedCaseId);
+      if (state.route === "cases") renderCases();
       return;
     }
     const legalButton = event.target.closest("[data-legal]");

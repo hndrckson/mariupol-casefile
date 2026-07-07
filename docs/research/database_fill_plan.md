@@ -1,6 +1,6 @@
 # Database Fill Research Plan
 
-Yes: the project should do an additional deep-research pass to fill the database, but it should be a separate source-bound ingestion sprint after the UX/PWA shell is stable.
+Yes: the project should do additional deep-research passes to fill the database. The first v1 fill pass was added on 2026-07-07 in `dashboard/casefile-extra-data.js`; future passes should keep expanding from source-bound records rather than unreviewed link dumps.
 
 ## Guardrails
 
@@ -30,7 +30,7 @@ Yes: the project should do an additional deep-research pass to fill the database
 
 ## First Fill Target
 
-Start with a 500-record curated pass:
+The first implemented fill pass adds curated case/evidence/source records and keeps the 4,895 original-map features as the high-volume lead set. The next target should be a 500-record curated pass:
 
 - 250 map features with media/provenance checked.
 - 100 evidence rows tied to major incidents.
@@ -39,3 +39,10 @@ Start with a 500-record curated pass:
 - 50 contradiction/source-limitation rows.
 
 This gives the dashboard enough density for realistic product testing while keeping review and provenance manageable.
+
+## Implemented V1 Overlay - 2026-07-07
+
+- Added a `Cases` route to the dashboard.
+- Added a research overlay with curated cases, sources, evidence, incidents, legal elements, contradictions, and import metadata.
+- Kept the original MariupolDestruction website/map as the backbone lead source.
+- Added `docs/research/deep_database_research.md` to record source hierarchy, data-quality rules, and next research sprint.

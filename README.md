@@ -15,6 +15,7 @@ The current workspace already has a local server listening on port 8765.
 ## Implemented V0
 
 - Dashboard with incident, evidence, map-feature, contradiction, legal-coverage, import, gap, and decay-risk surfaces.
+- Case Files route with curated source-backed cases tying incidents, evidence, legal elements, contradictions, and original-map categories together.
 - Real Leaflet map workspace using the captured MariupolDestruction public lead dataset.
 - Timeline, incidents, Evidence Vault, Legal Matrix, Contradictions, Report Builder, Imports/Connectors, and Settings views.
 - Inspector panel for incidents, evidence, legal elements, connectors, reports, contradictions, and map features.
@@ -35,8 +36,11 @@ The pre-build research prompt outputs live in `docs/research/`:
 - `legal_source_pack.md`
 - `research_gaps.md`
 - `database_fill_plan.md`
+- `deep_database_research.md`
 
 The research inventory was refreshed on 2026-07-03 with named UNOSAT/HDX source targets, official Meta access paths, RD4U status notes, and source-bound legal cautions.
+
+The first deep database fill pass was added on 2026-07-07. It keeps MariupolDestruction.com as the original backbone lead source, then layers in curated case/evidence/source records from HRW/SITU/Truth Hounds, UNOSAT, OHCHR, OSCE, ICC, Amnesty, GRC, AP/FRONTLINE, MSF, RD4U, and official Ukrainian documentation targets.
 
 ## QA
 
@@ -49,5 +53,7 @@ Design QA artifacts:
 - `docs/qa/mobile-dashboard-390x844.png`
 - `docs/qa/mobile-menu-open-390x844.png`
 - `docs/qa/mobile-map-390x844.png`
+- `docs/qa/casefiles-route-1280x720.png`
+- `docs/qa/casefiles-route-mobile-390x844.png`
 
 Final QA result: passed.

@@ -10,6 +10,8 @@
 - Mobile dashboard screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\mobile-dashboard-390x844.png`
 - Mobile menu-open screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\mobile-menu-open-390x844.png`
 - Mobile map screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\mobile-map-390x844.png`
+- Case files desktop screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\casefiles-route-1280x720.png`
+- Case files mobile screenshot: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\casefiles-route-mobile-390x844.png`
 - Full-view comparison evidence from prior reference pass: `C:\Users\Administrator\Documents\Codex\mariupol case file\docs\qa\dashboard-reference-vs-implementation.png`
 - Viewports: 1280x720 desktop, 390x844 mobile.
 - States: Dashboard, Map, and mobile navigation drawer.
@@ -20,6 +22,7 @@
 - Mobile navigation: passed. The burger is hidden on desktop and visible on mobile; the sidebar opens as an off-canvas drawer with a scrim, vertical nav, evidence-posture note, and data-integrity footer.
 - Mobile map: passed. At 390x844 the map route keeps document scrolling disabled, renders loaded Leaflet tiles, gives the map a 324px viewport, and keeps the map toolbar/layer stack/legend/inspector as internal scroll surfaces.
 - PWA shell: passed. The app now includes a manifest, theme metadata, local PNG icons, local Lucide bundle, and a same-origin service worker cache list. In-app browser service-worker APIs were not exposed for runtime registration verification, so install behavior should still be smoke-tested in Chrome/Safari.
+- Case files route: passed. The new route renders 8 source-backed case cards, opens the selected case in the inspector, exposes source links, and preserves fixed-shell scrolling on desktop and mobile.
 - Fonts and typography: passed. The implementation keeps the compact case-management hierarchy, zero letter spacing, readable dense controls, and button text that fits mobile containers.
 - Spacing and layout rhythm: passed. The desktop composition remains dense and inspector-forward; mobile uses a fixed app viewport with a short bottom inspector row and route-specific map sizing.
 - Colors and visual tokens: passed. The graphite, off-white, mint, amber, and coral tokens remain aligned with the reference language.
@@ -35,6 +38,7 @@
 - Completed: added off-canvas burger navigation and responsive mobile command/map tool rows.
 - Completed: made chips, filters, tables, inspector, map legend, and map layer stack scroll internally.
 - Completed: added PWA manifest, service worker, local app icons, and local Lucide bundle.
+- Completed: added the casefile route and the first deep database overlay with validated source/evidence/case links.
 - Completed: validated desktop/mobile shell behavior with browser screenshots and zero console errors in the desktop map pass.
 
 **Follow-up Polish**
