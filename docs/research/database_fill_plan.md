@@ -64,3 +64,14 @@ This gives the dashboard enough density for realistic product testing while keep
 - Added a `Map Leads` route with metrics, category composition, a review queue table, a local detail panel, and inspector actions.
 - Preserved privacy posture by withholding raw source titles in the public index and redacting grave/victim plus humanitarian-problem public titles and coordinates.
 - Advanced the original seed target of 300 map features without fabricating incidents or exposing sensitive source text.
+
+## Implemented Generated Database Fill - 2026-07-07
+
+- Added `scripts/build_database_fill.py` as a repeatable generator from `dashboard/casefile-map-index.js`.
+- Added `dashboard/casefile-generated-fill.js` with:
+  - 118 source-bound `E-MF-*` evidence-review packets.
+  - 30 `INC-MF-*` incident-review clusters.
+  - 118 `C-MF-*` claim rows.
+  - 1 additional contradiction set for original-map row review scope.
+- Reached the original v0 seed-density target: 150 evidence records, 40 incidents/pattern rows, 8 contradiction sets, 20 sources, and 300 map-feature review leads.
+- Kept every generated row in lead/review posture with `SRC-MARIUPOL-DESTRUCTION` provenance, rounded/redacted sensitive map lead handling, and explicit corroboration caveats.

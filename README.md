@@ -18,6 +18,7 @@ The current workspace already has a local server listening on port 8765.
 - Case Files route with curated source-backed cases tying incidents, evidence, legal elements, contradictions, and original-map categories together.
 - Resources route with the original MariupolDestruction map/source sections, map-layer counts, sensitivity posture, source register, and case/evidence/legal coverage.
 - Map Leads route with a generated 300-row public review sample from the original map capture, including provenance, media counts, redaction status, and linked cases/evidence.
+- Generated database-fill overlay that brings the v0 seed to 150 evidence records, 40 incident/pattern rows, 8 contradiction sets, and 300 map-feature review leads.
 - Real Leaflet map workspace using the captured MariupolDestruction public lead dataset.
 - Timeline, incidents, Evidence Vault, Legal Matrix, Contradictions, Report Builder, Imports/Connectors, and Settings views.
 - Inspector panel for incidents, evidence, legal elements, connectors, reports, contradictions, and map features.
@@ -42,12 +43,18 @@ The pre-build research prompt outputs live in `docs/research/`:
 
 The research inventory was refreshed on 2026-07-03 with named UNOSAT/HDX source targets, official Meta access paths, RD4U status notes, and source-bound legal cautions.
 
-The first deep database fill pass was added on 2026-07-07. It keeps MariupolDestruction.com as the original backbone lead source, then layers in curated case/evidence/source records from HRW/SITU/Truth Hounds, UNOSAT, OHCHR, OSCE, ICC, Amnesty, GRC, AP/FRONTLINE, MSF, RD4U, and official Ukrainian documentation targets. The current overlay exposes 14 source/resource collections, including the original website section index and the 11 original-map layer categories. A generated map-feature index now adds 300 source-bound review leads from the 4,895-feature original map capture.
+The first deep database fill pass was added on 2026-07-07. It keeps MariupolDestruction.com as the original backbone lead source, then layers in curated case/evidence/source records from HRW/SITU/Truth Hounds, UNOSAT, OHCHR, OSCE, ICC, Amnesty, GRC, AP/FRONTLINE, MSF, RD4U, and official Ukrainian documentation targets. The current overlay exposes 14 source/resource collections, including the original website section index and the 11 original-map layer categories. A generated map-feature index now adds 300 source-bound review leads from the 4,895-feature original map capture. A generated database-fill layer adds 118 map-derived evidence-review packets, 30 incident-review clusters, 118 claim rows, and one source-status contradiction so the local seed meets the v0 density targets without promoting leads to verified findings.
 
 Regenerate the map-feature review index with:
 
 ```text
 python scripts/build_map_feature_index.py
+```
+
+Regenerate the database-fill overlay with:
+
+```text
+python scripts/build_database_fill.py
 ```
 
 ## QA
@@ -67,5 +74,10 @@ Design QA artifacts:
 - `docs/qa/resources-route-mobile-390x844.png`
 - `docs/qa/map-leads-route-1280x720.png`
 - `docs/qa/map-leads-route-mobile-390x844.png`
+- `docs/qa/evidence-route-150-1280x720.png`
+- `docs/qa/evidence-route-150-mobile-390x844.png`
+- `docs/qa/evidence-route-mobile-menu-open-390x844.png`
+- `docs/qa/incidents-route-40-1280x720.png`
+- `docs/qa/incidents-route-40-mobile-390x844.png`
 
 Final QA result: passed.

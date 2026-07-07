@@ -68,6 +68,8 @@ The dashboard now exposes the capture through `seed.resourceCollections` and the
 
 `scripts/build_map_feature_index.py` also derives a public `mapFeatureIndex` review sample from this capture. The generated dashboard overlay contains 300 source-bound rows selected by original layer and media/link density. High-sensitivity grave/victim and humanitarian rows use redacted public titles and rounded coordinates.
 
+`scripts/build_database_fill.py` consumes that public review sample and generates the v0 database-fill overlay: 118 evidence-review packets, 30 incident-review clusters, 118 claim rows, and one contradiction set. These generated rows keep `SRC-MARIUPOL-DESTRUCTION` provenance and lead-review status; they do not expose raw sensitive titles or convert map leads into verified findings.
+
 ## Inferred Classes
 
 These classes are inferred from layer names and explicit title text. They should be treated as import labels, not final legal findings.

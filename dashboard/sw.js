@@ -1,13 +1,14 @@
-const CACHE_NAME = "mariupol-casefile-v0-20260707-mapleads2";
+const CACHE_NAME = "mariupol-casefile-v0-20260707-dbfill1";
 
 const SHELL_ASSETS = [
   "./",
   "index.html",
-  "styles.css?v=casefile-v0-20260707-mapleads2",
-  "casefile-data.js?v=casefile-v0-20260707-mapleads2",
-  "casefile-extra-data.js?v=casefile-v0-20260707-mapleads2",
-  "casefile-map-index.js?v=casefile-v0-20260707-mapleads2",
-  "app.js?v=casefile-v0-20260707-mapleads2",
+  "styles.css?v=casefile-v0-20260707-dbfill1",
+  "casefile-data.js?v=casefile-v0-20260707-dbfill1",
+  "casefile-extra-data.js?v=casefile-v0-20260707-dbfill1",
+  "casefile-map-index.js?v=casefile-v0-20260707-dbfill1",
+  "casefile-generated-fill.js?v=casefile-v0-20260707-dbfill1",
+  "app.js?v=casefile-v0-20260707-dbfill1",
   "manifest.webmanifest",
   "vendor/leaflet/leaflet.css",
   "vendor/leaflet/leaflet.js",
